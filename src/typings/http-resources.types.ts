@@ -8,6 +8,12 @@ export type ApiResponseBody = {
   pagination?: ApiResponsePagination
 }
 
+export type GoogleApiResponseBody = {
+  kind: string
+  etag: string
+  users?: Array<object> | object
+}
+
 export type ApiResponsePagination = {
   current_page: number
   last_page: number

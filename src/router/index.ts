@@ -4,6 +4,7 @@ import Dashboard from '@/views/DashboardPage.vue'
 import ProfilePage from '@/views/ProfilePage.vue'
 import SupportPage from '@/views/SupportPage.vue'
 import AboutUsPage from '@/views/AboutUsPage.vue'
+import GoogleUsersPage from '@/views/GoogleUsersPage.vue'
 import AnnouncementsPage from '@/views/AnnouncementsPage.vue'
 import { AuthRole, AuthType } from '@/typings/auth.types.ts'
 import { useAuthStore } from '@/stores/auth.store.ts'
@@ -190,6 +191,18 @@ const routes = [
         component: () => import('@/views/SettingsPage.vue'),
         meta: <RouteMeta>{
           label: 'Settings',
+          isSidebarMenu: true,
+          group: RouteGroup.ADMIN_TOOLS,
+          authType: AuthType.AUTHENTICATED,
+          roles: [AuthRole.ADMIN, AuthRole.SUPER_USER],
+        },
+      },
+      {
+        path: 'google-user',
+        name: 'google-user',
+        component: () => import('@/views/GoogleUsersPage.vue'),
+        meta: <RouteMeta>{
+          label: 'Google Users',
           isSidebarMenu: true,
           group: RouteGroup.ADMIN_TOOLS,
           authType: AuthType.AUTHENTICATED,

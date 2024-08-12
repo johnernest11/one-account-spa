@@ -1,26 +1,28 @@
 <script setup lang="ts">
-import { computed, onBeforeMount, reactive, ref, toRef, toRefs } from 'vue'
-import { UserPayload, useUsersStore } from '@/stores/users.store.ts'
-import WbAutoComplete, { WbAutoCompleteOption, WbAutoCompleteOptionTrueValue } from '@/components/webkit/WbAutoComplete.vue'
-import { useAddressStore } from '@/stores/address.store.ts'
-import { storeToRefs } from 'pinia'
-import { useClearSelectedAddressIfNotInParentList, useFilterByParentId } from '@/composables/address.options.ts'
+// import { computed, onBeforeMount, reactive, ref, toRef, toRefs } from 'vue'
+import { computed, reactive, ref } from 'vue'
+import { UserPayload, useGoogleUsersStore } from '@/stores/google-users.store.ts'
+// import WbAutoComplete, { WbAutoCompleteOption, WbAutoCompleteOptionTrueValue } from '@/components/webkit/WbAutoComplete.vue'
+// import { useAddressStore } from '@/stores/address.store.ts'
+// import { storeToRefs } from 'pinia'
+// import { useClearSelectedAddressIfNotInParentList, useFilterByParentId } from '@/composables/address.options.ts'
 import { email, helpers, maxLength, required } from '@vuelidate/validators'
-import { digitCountRule, mobilePhoneRule, uniqueUserIdentifierRule } from '@/utils/custom-validations.ts'
+import { mobilePhoneRule, uniqueUserIdentifierRule } from '@/utils/custom-validations.ts'
 import useVuelidate from '@vuelidate/core'
-import { useRolesStore } from '@/stores/roles.store.ts'
-import { AuthRole } from '@/typings/auth.types.ts'
+// import { useRolesStore } from '@/stores/roles.store.ts'
+// import { AuthRole } from '@/typings/auth.types.ts'
 import { useToast } from 'primevue/usetoast'
-import { UserResponse } from '@/typings/models.types.ts'
+import { GoogleUserResponse } from '@/typings/models.types.ts'
+// import { UserResponse, GoogleUserResponse } from '@/typings/models.types.ts'
 import { parseApiResponseError } from '@/utils/error-handle.ts'
-import { useWbAutoCompleteHandleTrueValue } from '@/composables/wb-ui-components.ts'
+// import { useWbAutoCompleteHandleTrueValue } from '@/composables/wb-ui-components.ts'
 import Button from 'primevue/button'
-import WbMultiSelect from '@/components/webkit/WbMultiSelect.vue'
+// import WbMultiSelect from '@/components/webkit/WbMultiSelect.vue'
 import WbInputMask from '@/components/webkit/WbInputMask.vue'
 import WbInputText from '@/components/webkit/WbInputText.vue'
 import WbDropdown from '@/components/webkit/WbDropdown.vue'
-import WbCalendar from '@/components/webkit/WbCalendar.vue'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+// import WbCalendar from '@/components/webkit/WbCalendar.vue'
+// import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import InputSwitch from 'primevue/inputswitch'
 import Message from 'primevue/message'
 import { useConfirm } from 'primevue/useconfirm'
@@ -35,112 +37,120 @@ const emit = defineEmits<{
 }>()
 
 /** Props */
+// type UserDetailsFormProps = {
+//   currentRoleFilter: number | string | null
+//   user: UserResponse
+// }
+
 type UserDetailsFormProps = {
   currentRoleFilter: number | string | null
-  user: UserResponse
+  user: GoogleUserResponse
 }
 const props = withDefaults(defineProps<UserDetailsFormProps>(), {
   currentRoleFilter: null,
 })
 
+console.log(props.user)
 /** Payload */
 const payload = reactive<Partial<UserPayload>>({
-  email: props.user.email || '',
-  mobile_number: props.user.user_profile?.mobile_number || null,
-  first_name: props.user.user_profile?.first_name || '',
-  last_name: props.user.user_profile?.last_name || '',
-  middle_name: props.user.user_profile?.middle_name || null,
-  ext_name: props.user.user_profile?.ext_name || null,
-  birthday: props.user.user_profile?.birthday || null,
-  sex: props.user.user_profile?.sex || null,
-  home_address: props.user.user_profile?.address?.home_address || null,
-  city_id: props.user.user_profile?.address?.city?.id || null,
-  province_id: props.user.user_profile?.address?.province?.id || null,
-  region_id: props.user.user_profile?.address?.region?.id || null,
-  postal_code: props.user.user_profile?.address?.postal_code || null,
-  barangay_id: props.user.user_profile?.address?.barangay?.id || null,
-  roles: props.user.roles.map((r) => r.id),
-  active: props.user.active,
+  email: props.user.primaryEmail || '',
+  // mobile_number: props.user.phones[0].value || null,
+  first_name: props.user.name?.givenName || '',
+  last_name: props.user.name?.familyName || '',
+  suspended: props.user.suspended,
+  // middle_name: props.user.user_profile?.middle_name || null,
+  // ext_name: props.user.user_profile?.ext_name || null,
+  // birthday: props.user.user_profile?.birthday || null,
+  // sex: props.user.user_profile?.sex || null,
+  // home_address: props.user.user_profile?.address?.home_address || null,
+  // city_id: props.user.user_profile?.address?.city?.id || null,
+  // province_id: props.user.user_profile?.address?.province?.id || null,
+  // region_id: props.user.user_profile?.address?.region?.id || null,
+  // postal_code: props.user.user_profile?.address?.postal_code || null,
+  // barangay_id: props.user.user_profile?.address?.barangay?.id || null,
+  // roles: props.user.roles.map((r) => r.id),
+
 })
 
 // We disabled editing and deletion for super users
 const userIsSuperUser = computed(() => {
-  return !!props.user.roles.find((r) => AuthRole.SUPER_USER.toString() === r.name)
+  // return !!props.user.roles.find((r) => AuthRole.SUPER_USER.toString() === r.name)
+  return false
 })
 
 // Toggle Edit Button
 const editingEnabled = ref(false)
 
 // Start combo and select box options
-const genderOptions = [
-  { label: 'Male', value: 'male' },
-  { label: 'Female', value: 'female' },
-]
+// const genderOptions = [
+//   { label: 'Male', value: 'male' },
+//   { label: 'Female', value: 'female' },
+// ]
 
 const activationOptions = [
-  { label: 'Activated', value: true },
-  { label: 'Deactivated', value: false },
+  { label: 'Suspend', value: true },
+  { label: 'Unsuspend', value: false },
 ]
 
 /** Roles Options */
-const rolesStore = useRolesStore()
-const rolesOptionsIsLoading = ref(false)
-const rolesOptions = computed(() => {
-  // Admins should not be able to select the Super User option
-  return rolesStore.roleOptions.filter((r) => r.name !== AuthRole.SUPER_USER.toString())
-})
-onBeforeMount(async () => {
-  rolesOptionsIsLoading.value = true
-  await rolesStore.fetchRoles()
-  rolesOptionsIsLoading.value = false
-})
+// const rolesStore = useRolesStore()
+// const rolesOptionsIsLoading = ref(false)
+// const rolesOptions = computed(() => {
+//   // Admins should not be able to select the Super User option
+//   return rolesStore.roleOptions.filter((r) => r.name !== AuthRole.SUPER_USER.toString())
+// })
+// onBeforeMount(async () => {
+//   rolesOptionsIsLoading.value = true
+//   await rolesStore.fetchRoles()
+//   rolesOptionsIsLoading.value = false
+// })
 
 /** Address Section **/
 /** Address WbAutoComplete Object References */
-const selectedRegion = ref<WbAutoCompleteOption | null>(null)
-const selectedProvince = ref<WbAutoCompleteOption | null>(null)
-const selectedCity = ref<WbAutoCompleteOption | null>(null)
-const selectedBarangay = ref<WbAutoCompleteOption | null>(null)
+// const selectedRegion = ref<WbAutoCompleteOption | null>(null)
+// const selectedProvince = ref<WbAutoCompleteOption | null>(null)
+// const selectedCity = ref<WbAutoCompleteOption | null>(null)
+// const selectedBarangay = ref<WbAutoCompleteOption | null>(null)
 
 /** Initialize Address Options List */
-const publicStore = useAddressStore()
-const addressesAreLoading = ref(false)
-onBeforeMount(async () => {
-  addressesAreLoading.value = true
-  await Promise.allSettled([
-    publicStore.fetchRegions(),
-    publicStore.fetchProvinces(),
-    publicStore.fetchCities(),
-    publicStore.fetchBarangays(),
-  ])
+// const publicStore = useAddressStore()
+// const addressesAreLoading = ref(false)
+// onBeforeMount(async () => {
+//   addressesAreLoading.value = true
+//   await Promise.allSettled([
+//     publicStore.fetchRegions(),
+//     publicStore.fetchProvinces(),
+//     publicStore.fetchCities(),
+//     publicStore.fetchBarangays(),
+//   ])
 
-  // Set the initial value of the selected addresses
-  selectedRegion.value = publicStore.regionOptions.find((r) => r.value === props.user.user_profile?.address?.region?.id) || null
-  selectedProvince.value =
-    publicStore.provinceOptions.find((p) => p.value === props.user.user_profile?.address?.province?.id) || null
-  selectedCity.value = publicStore.cityOptions.find((c) => c.value === props.user.user_profile?.address?.city?.id) || null
-  selectedBarangay.value =
-    publicStore.barangayOptions.find((b) => b.value === props.user.user_profile?.address?.barangay?.id) || null
+//   // Set the initial value of the selected addresses
+//   selectedRegion.value = publicStore.regionOptions.find((r) => r.value === props.user.user_profile?.address?.region?.id) || null
+//   selectedProvince.value =
+//     publicStore.provinceOptions.find((p) => p.value === props.user.user_profile?.address?.province?.id) || null
+//   selectedCity.value = publicStore.cityOptions.find((c) => c.value === props.user.user_profile?.address?.city?.id) || null
+//   selectedBarangay.value =
+//     publicStore.barangayOptions.find((b) => b.value === props.user.user_profile?.address?.barangay?.id) || null
 
-  addressesAreLoading.value = false
-})
+//   addressesAreLoading.value = false
+// })
 
 /** We only display a list based on parent address */
-const { provinceOptions, cityOptions, barangayOptions } = storeToRefs(publicStore)
-const filteredProvinceOptionsByRegion = useFilterByParentId(toRef(payload, 'region_id', null), provinceOptions)
-const filteredCityOptionsByProvince = useFilterByParentId(toRef(payload, 'province_id', null), cityOptions)
-const filteredBarangayOptionsByCity = useFilterByParentId(toRef(payload, 'city_id', null), barangayOptions)
+// const { provinceOptions, cityOptions, barangayOptions } = storeToRefs(publicStore)
+// const filteredProvinceOptionsByRegion = useFilterByParentId(toRef(payload, 'region_id', null), provinceOptions)
+// const filteredCityOptionsByProvince = useFilterByParentId(toRef(payload, 'province_id', null), cityOptions)
+// const filteredBarangayOptionsByCity = useFilterByParentId(toRef(payload, 'city_id', null), barangayOptions)
 
 /** We set the `selected<Address>` and `payload.<address>_id` to null if the parent is changed */
-useClearSelectedAddressIfNotInParentList(
-  toRefs(payload),
-  selectedProvince,
-  selectedCity,
-  selectedBarangay,
-  filteredProvinceOptionsByRegion,
-  filteredCityOptionsByProvince,
-  filteredBarangayOptionsByCity
-)
+// useClearSelectedAddressIfNotInParentList(
+//   toRefs(payload),
+//   selectedProvince,
+//   selectedCity,
+//   selectedBarangay,
+//   filteredProvinceOptionsByRegion,
+//   filteredCityOptionsByProvince,
+//   filteredBarangayOptionsByCity
+// )
 
 /** Form Validation */
 const globalStringMaxLength = import.meta.env.VITE_GLOBAL_STRING_MAX_LENGTH
@@ -163,9 +173,9 @@ const formRules = {
       helpers.withMessage('This mobile number is already taken', uniqueUserIdentifierRule('mobile_number', props.user.id))
     ),
   },
-  roles: {
-    required: helpers.withMessage('A user must have a role selected', required),
-  },
+  // roles: {
+  //   required: helpers.withMessage('A user must have a role selected', required),
+  // },
   first_name: {
     required: helpers.withMessage('Please enter your first name', required),
     maxLength: globalStringMaxLengthRule,
@@ -174,18 +184,18 @@ const formRules = {
     required: helpers.withMessage('Please enter your last name', required),
     maxLength: globalStringMaxLengthRule,
   },
-  middle_name: {
-    maxLength: globalStringMaxLengthRule,
-  },
-  ext_name: {
-    maxLength: globalStringMaxLengthRule,
-  },
-  home_address: {
-    maxLength: globalStringMaxLengthRule,
-  },
-  postal_code: {
-    digitCount: helpers.withMessage('Enter your 4-digit zip code', digitCountRule(4)),
-  },
+  // middle_name: {
+  //   maxLength: globalStringMaxLengthRule,
+  // },
+  // ext_name: {
+  //   maxLength: globalStringMaxLengthRule,
+  // },
+  // home_address: {
+  //   maxLength: globalStringMaxLengthRule,
+  // },
+  // postal_code: {
+  //   digitCount: helpers.withMessage('Enter your 4-digit zip code', digitCountRule(4)),
+  // },
 }
 
 // Handle Form Submission
@@ -194,7 +204,7 @@ const formIsSubmitting = ref(false)
 const showErrorAlert = ref(false)
 const errorMessage = ref<string | null>(null)
 const errorDetails = ref<string[]>([])
-const userStore = useUsersStore()
+const userStore = useGoogleUsersStore()
 const toast = useToast()
 const handleFormSubmission = async () => {
   const valid = await validator.value.$validate()
@@ -210,8 +220,7 @@ const handleFormSubmission = async () => {
   }
 
   formIsSubmitting.value = true
-  // const response = await userStore.updateUser(payload, props.user.id)
-  const response = await userStore.updateUser(payload, props.user.email)
+  const response = await userStore.updateUser(payload, props.user.primaryEmail)
   // Handle the API error
   if (!response.success) {
     const result = parseApiResponseError(response)
@@ -239,10 +248,11 @@ const handleFormSubmission = async () => {
 /** Handle User Deletion */
 const userIsBeingDeleted = ref(false)
 const handleUserDeletion = async () => {
-  userIsBeingDeleted.value = true
-  const response = await userStore.deleteUser(props.user.id)
 
-  if (!response.success) {
+  userIsBeingDeleted.value = true
+  const response = await userStore.deleteUser(props.user?.primaryEmail)
+
+  if (!response) {
     const result = parseApiResponseError(response)
     if (!result) return (formIsSubmitting.value = false)
 
@@ -256,7 +266,7 @@ const handleUserDeletion = async () => {
   toast.add({
     severity: 'success',
     summary: 'User Deletion',
-    detail: `${props.user.user_profile?.full_name || 'The user '} was successfully deleted`,
+    detail: `${props.user.name?.fullName || 'The user '} was successfully deleted`,
     life: 5000,
   })
 
@@ -269,7 +279,7 @@ const requireConfirmation = (event: Event) => {
   confirm.require({
     group: 'global',
     target: event.currentTarget as HTMLElement,
-    message: ` Are you sure you want to delete ${props.user.user_profile?.full_name || 'this user'}? You cannot undo this.`,
+    message: ` Are you sure you want to delete ${props.user.name?.fullName || 'this user'}? You cannot undo this.`,
     header: 'Delete User',
     acceptLabel: 'Confirm Deletion',
     rejectLabel: 'Cancel',
@@ -358,10 +368,38 @@ const settingsStore = useSettingsStore()
           </template>
         </WbInputMask>
       </div>
+            <!-- Start First name and Middle name -->
+            <div class="flex flex-col gap-4 md:flex-row">
+        <WbInputText
+          v-model="payload.first_name"
+          label="First name *"
+          :invalid="validator.first_name.$invalid"
+          :invalid-text="validator.first_name.$errors[0]?.$message"
+          @blur="validator.first_name.$touch"
+          :disabled="!editingEnabled"
+        >
+          <template #prepend-icon>
+            <i class="pi pi-id-card" />
+          </template>
+        </WbInputText>
+        <WbInputText
+          v-model="payload.last_name"
+          label="Last name *"
+          :invalid="validator.last_name.$invalid"
+          :invalid-text="validator.last_name.$errors[0]?.$message"
+          @blur="validator.last_name.$touch"
+          :disabled="!editingEnabled"
+        >
+          <template #prepend-icon>
+            <i class="pi pi-id-card" />
+          </template>
+        </WbInputText>
+
+      </div>
       <!-- End Email and Mobile Number -->
       <!-- Start Roles & Activation Select -->
       <div class="flex flex-col gap-4 md:flex-row">
-        <div class="flex md:w-[49%] md:flex-row">
+        <!-- <div class="flex md:w-[49%] md:flex-row">
           <WbMultiSelect
             v-model="payload.roles"
             :options="rolesOptions"
@@ -379,14 +417,14 @@ const settingsStore = useSettingsStore()
             @blur="validator.roles.$touch"
             @focusin="validator.roles.$dirty = false"
           />
-        </div>
+        </div> -->
         <div class="flex md:w-[49%] md:flex-row">
           <WbDropdown
-            v-model="payload.active"
+            v-model="payload.suspended"
             :options="activationOptions"
             optionLabel="label"
             optionValue="value"
-            label="Activation Status"
+            label="Suspend User"
             :disabled="!editingEnabled"
           >
             <template #prepend-icon>
@@ -399,43 +437,17 @@ const settingsStore = useSettingsStore()
       <!-- End Credentials -->
 
       <!-- Start Personal Information -->
-      <p class="mt-4 text-xs font-medium uppercase md:mt-6">Basic Information</p>
-      <!-- Start First name and Middle name -->
-      <div class="flex flex-col gap-4 md:flex-row">
-        <WbInputText
-          v-model="payload.first_name"
-          label="First name *"
-          :invalid="validator.first_name.$invalid"
-          :invalid-text="validator.first_name.$errors[0]?.$message"
-          @blur="validator.first_name.$touch"
-          :disabled="!editingEnabled"
-        >
-          <template #prepend-icon>
-            <i class="pi pi-id-card" />
-          </template>
-        </WbInputText>
+      <!-- <p class="mt-4 text-xs font-medium uppercase md:mt-6">Basic Information</p> -->
+
+      <!-- End First name and Middle name -->
+      <!-- Start Last name and Extension name -->
+      <!-- <div class="flex flex-col gap-4 md:flex-row">
         <WbInputText
           v-model="payload.middle_name"
           label="Middle name"
           :invalid="validator.middle_name.$invalid"
           :invalid-text="validator.middle_name.$errors[0]?.$message"
           @blur="validator.middle_name.$touch"
-          :disabled="!editingEnabled"
-        >
-          <template #prepend-icon>
-            <i class="pi pi-id-card" />
-          </template>
-        </WbInputText>
-      </div>
-      <!-- End First name and Middle name -->
-      <!-- Start Last name and Extension name -->
-      <div class="flex flex-col gap-4 md:flex-row">
-        <WbInputText
-          v-model="payload.last_name"
-          label="Last name *"
-          :invalid="validator.last_name.$invalid"
-          :invalid-text="validator.last_name.$errors[0]?.$message"
-          @blur="validator.last_name.$touch"
           :disabled="!editingEnabled"
         >
           <template #prepend-icon>
@@ -454,10 +466,10 @@ const settingsStore = useSettingsStore()
             <i class="pi pi-id-card" />
           </template>
         </WbInputText>
-      </div>
+      </div> -->
       <!-- End Last name and Extension name -->
       <!-- Start Sex and Birthday -->
-      <div class="flex flex-col gap-4 md:flex-row">
+      <!-- <div class="flex flex-col gap-4 md:flex-row">
         <WbDropdown
           v-model="payload.sex"
           :options="genderOptions"
@@ -481,14 +493,14 @@ const settingsStore = useSettingsStore()
             <i class="pi pi-gift" />
           </template>
         </WbCalendar>
-      </div>
+      </div> -->
       <!-- End Sex and Birthday -->
       <!-- End Personal Information -->
 
       <!-- Start Address -->
-      <p class="md:6 mt-4 text-xs font-medium uppercase">Address</p>
+      <!-- <p class="md:6 mt-4 text-xs font-medium uppercase">Address</p> -->
       <!-- Start Region and Province -->
-      <div class="flex flex-col gap-4 md:flex-row">
+      <!-- <div class="flex flex-col gap-4 md:flex-row">
         <WbAutoComplete
           v-model="selectedRegion"
           :suggestions="publicStore.regionOptions"
@@ -523,10 +535,10 @@ const settingsStore = useSettingsStore()
             <i class="pi pi-map" />
           </template>
         </WbAutoComplete>
-      </div>
+      </div> -->
       <!-- End Region and Province -->
       <!-- Start City and Barangay -->
-      <div class="flex flex-col gap-4 md:flex-row">
+      <!-- <div class="flex flex-col gap-4 md:flex-row">
         <WbAutoComplete
           v-model="selectedCity"
           :suggestions="filteredCityOptionsByProvince"
@@ -561,10 +573,10 @@ const settingsStore = useSettingsStore()
             <i class="pi pi-map" />
           </template>
         </WbAutoComplete>
-      </div>
+      </div> -->
       <!-- End City and Barangay -->
       <!-- Start Home Address and Zip Code -->
-      <div class="flex flex-col gap-4 md:flex-row">
+      <!-- <div class="flex flex-col gap-4 md:flex-row">
         <WbInputText
           v-model="payload.home_address"
           label="Home Address"
@@ -590,7 +602,7 @@ const settingsStore = useSettingsStore()
             <i class="pi pi-map" />
           </template>
         </WbInputMask>
-      </div>
+      </div> -->
       <!-- End Home Address and Zip Code -->
       <!-- End Address -->
 
@@ -602,7 +614,7 @@ const settingsStore = useSettingsStore()
           label="Delete"
           severity="danger"
           :loading="userIsBeingDeleted"
-          :disabled="formIsSubmitting || addressesAreLoading || !editingEnabled || userIsBeingDeleted"
+          :disabled="formIsSubmitting || !editingEnabled || userIsBeingDeleted"
         >
           <template #icon>
             <i class="pi pi-trash mr-2"></i>
@@ -614,7 +626,7 @@ const settingsStore = useSettingsStore()
           @click="handleFormSubmission"
           label="Update"
           :loading="formIsSubmitting"
-          :disabled="formIsSubmitting || addressesAreLoading || !editingEnabled"
+          :disabled="formIsSubmitting || !editingEnabled"
         >
           <template #icon>
             <i class="pi pi-save mr-2"></i>
@@ -634,7 +646,7 @@ const settingsStore = useSettingsStore()
     >
       <ManageMfaForm
         :user-id="props.user.id"
-        :user-full-name="props.user.user_profile?.full_name || ''"
+        :user-full-name="props.user.name?.fullName || ''"
         @mfa-config-updated="showMfaConfigDialog = false"
       />
     </Dialog>

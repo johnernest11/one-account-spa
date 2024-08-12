@@ -60,6 +60,21 @@ export type UserResponse = {
   user_profile?: UserProfileResponse
 } & ApiResponseData
 
+export type GoogleUserResponse = {
+  primaryEmail: string;
+  id: string | number;
+  name: Array<GoogleUser>;
+  phones: Array<{ type: string | number; value: string }>
+  suspended: boolean
+}
+
+// Define the type for each user in the 'users' array
+export type GoogleUser = {
+    givenName: string;
+    familyName: string;
+    fullName: string;
+};
+
 export type UserProfileResponse = {
   first_name: string
   last_name: string
