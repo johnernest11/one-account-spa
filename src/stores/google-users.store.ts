@@ -34,7 +34,7 @@ export const useGoogleUsersStore = defineStore('users', () => {
   const authStore = useAuthStore()
   // Google base url and API 
   const apiUrl = 'https://admin.googleapis.com/admin/directory/v1/users'
-  const authToken = 'ya29.a0AcM612zju6b6_l-jLfk6LzLwvYSI_3-JMJMxWggft30EFeohTHfC_KWpZ-s6-mmvKZf7x9WhLyKNKtNIIuZOA4VMOThKbg1fA6-pT6zgCDH9AnIm7h9WXsjmQZdj0Z9h9XKNXJk8lsJzbuEPeg0qhnniJG5T-tZ2ouuDaCgYKAdsSARASFQHGX2MiT6znrjJNdF7NWsloqPznFQ0171'
+  const authToken = 'ya29.a0AcM612xG6hUScUwfK5JvK0kOhmRDLNpskEVyANepeM21R2LvrLsVzlWqZ6_00ZtG0RIOeNwuQu5HBRSt21NCZHDP9eClM4YeaTBZsZlNuuMc2r1DmpTIImiYbX71vDFYPvyJjk5lPDTnkJYCc_udNMvsGq8bY3Xdco6RaCgYKAXISARASFQHGX2MilBQCk_I4HBxf0zi8pif9ew0171'
   /** States */
   const users = ref<GoogleUserResponse[]>([])
 
@@ -75,10 +75,6 @@ export const useGoogleUsersStore = defineStore('users', () => {
     const responseBody: ApiResponseBody = data.value
 
     if (responseBody.success) {
-      // // check if the update is still within the role filters param
-      // if (user.roles?.length && (roleFilter === null || (roleFilter && user.roles.includes(roleFilter)))) {
-      //   users.value.unshift(responseBody.data as UserResponse)
-      // }
       alert("User created successfully.")
     }
 
@@ -91,22 +87,13 @@ export const useGoogleUsersStore = defineStore('users', () => {
     const responseBody: ApiResponseBody = data.value
 
     if (responseBody.success) {
-      // // check if the update is still within the role filters param
-      // if (user.roles?.length && (roleFilter === null || (roleFilter && user.roles.includes(roleFilter)))) {
-      //   users.value.unshift(responseBody.data as UserResponse)
-      // }
       alert("User created successfully.")
     }
 
     return responseBody
   }
 
-
   const updateUser = async (user: Partial<UserPayload>, id: string | number) => {
-    // The API only accepts Y-m-d format (2024-01-31)
-    // if (user.birthday) {
-    //   user.birthday = useDateFormat(user.birthday, 'YYYY-MM-DD').value.toString()
-    // }
 
     const userData = {
       primaryEmail: user.email,
@@ -131,25 +118,13 @@ export const useGoogleUsersStore = defineStore('users', () => {
       const index = users.value.findIndex((user) => user.id === id)
       if (index === -1) return responseBody
       // users.value[index] = responseBody.data as UserResponse
-
-      // Check if the update is still within the role filters param
-      // if (user.roles?.length && roleFilter !== null && !user.roles.includes(roleFilter)) {
-      //   users.value.splice(index, 1)
-      // }
     }
 
     return responseBody
   }
 
   const deleteUser = async (id: string | number) => {
-    // const { data, statusCode } = await useExternalApiCall(`${apiUrl}/${id}`, authToken).delete().json()
     const { data } = await useExternalApiCall(`${apiUrl}/${id}`, authToken).delete().json()
-
-    // if (statusCode.value === 204) {
-    //   users.value = users.value.filter((user) => user.id !== id)
-    //   return { success: true, message: 'User deleted' }
-    // }
-
     return data.value as ApiResponseBody
   }
 
