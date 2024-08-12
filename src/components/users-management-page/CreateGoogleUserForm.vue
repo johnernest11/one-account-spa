@@ -90,7 +90,7 @@ const handleFormSubmission = async () => {
 
   formIsSubmitting.value = true
   // Auth Token
-  // User data to be created
+  // User data to be created @dev.dx-dswd.com
   const userData = {
     primaryEmail: payload.email,
     name: {
@@ -98,7 +98,7 @@ const handleFormSubmission = async () => {
       familyName: payload.last_name
     },
     password: payload.password, // Ensure to use hashed passwords in production
-    changePasswordAtNextLogin: true
+    changePasswordAtNextLogin: true,
   }
   // Create Google workspace Account
   const responseGoogle = await userStore.createUser(userData)

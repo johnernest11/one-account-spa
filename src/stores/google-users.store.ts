@@ -34,7 +34,7 @@ export const useGoogleUsersStore = defineStore('users', () => {
   const authStore = useAuthStore()
   // Google base url and API 
   const apiUrl = 'https://admin.googleapis.com/admin/directory/v1/users'
-  const authToken = 'ya29.a0AcM612xG6hUScUwfK5JvK0kOhmRDLNpskEVyANepeM21R2LvrLsVzlWqZ6_00ZtG0RIOeNwuQu5HBRSt21NCZHDP9eClM4YeaTBZsZlNuuMc2r1DmpTIImiYbX71vDFYPvyJjk5lPDTnkJYCc_udNMvsGq8bY3Xdco6RaCgYKAXISARASFQHGX2MilBQCk_I4HBxf0zi8pif9ew0171'
+  const authToken = 'ya29.a0AcM612yfiLuBtwXwRBCV_adJ36IjUdoSQQX7kGF0WOPZAtyO_KZIN7LpXC0fhA_oH-R3QBvonRjxf8E8JL2pj7kJULnGqnopA-3ZmVdOxitu0gLjFVEgQn1rD0QKO_Fqk6ltlbbDMRMzKox5OAhH6E_zKsuw0HGcbJymaCgYKAQASARASFQHGX2MiDaRtNaxce-kg4z67YrnzPw0171'
   /** States */
   const users = ref<GoogleUserResponse[]>([])
 
@@ -71,6 +71,7 @@ export const useGoogleUsersStore = defineStore('users', () => {
 
   const createUser = async (user: Partial<UserPayload>) => {
     // Define your API key and endpoint
+    console.log(user)
     const { data } = await useExternalApiCall(apiUrl, authToken).post(user).json()
     const responseBody: ApiResponseBody = data.value
 
