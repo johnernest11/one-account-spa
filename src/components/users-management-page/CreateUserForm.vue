@@ -23,6 +23,7 @@ import Message from 'primevue/message'
 import WbMultiSelect from '@/components/webkit/WbMultiSelect.vue'
 import { useRolesStore } from '@/stores/roles.store.ts'
 import { AuthRole } from '@/typings/auth.types.ts'
+import { useUserAccountStore } from '@/stores/google-users.store.ts'
 
 /** Props */
 const props = withDefaults(defineProps<{ currentRoleFilter: number | string | null }>(), {
@@ -46,6 +47,8 @@ const payload = reactive<Partial<UserPayload>>({
   postal_code: null,
   barangay_id: null,
   roles: [],
+  cn:'',
+  gmail:'',
 })
 
 /** Gender Options */
@@ -76,6 +79,7 @@ const selectedBarangay = ref<WbAutoCompleteOption | null>(null)
 
 // Initialize Address Options List
 const publicStore = useAddressStore()
+
 const addressesAreLoading = ref(false)
 onBeforeMount(async () => {
   addressesAreLoading.value = true
@@ -167,6 +171,7 @@ const showErrorAlert = ref(false)
 const errorMessage = ref<string | null>(null)
 const errorDetails = ref<string[]>([])
 const userStore = useUsersStore()
+const userAccountStore = useUserAccountStore()
 const toast = useToast()
 
 /** Emits */
@@ -189,7 +194,41 @@ const handleFormSubmission = async () => {
   }
 
   formIsSubmitting.value = true
+
+  const username = payload.email?.split('@')[0]
+  const initials = payload.middle_name?.toString().charAt(0);
+  // Create Google workspace Account @dev.dx-dswd.com
+  const userData = {
+    primaryEmail: `${username}@dev.dx-dswd.com`,
+    name: {
+      givenName: payload.first_name,
+      familyName: payload.last_name
+    },
+    password: payload.password, // Ensure to use hashed passwords in production
+    changePasswordAtNextLogin: true,
+  }
+
+  // Create Google User Account
+  await userAccountStore.createGoogleUser(userData)
+
+  const userAdPayload = {
+    cn:`${payload.first_name} ${initials} ${payload.last_name}`,
+    givenname: payload.first_name,
+    sn: payload.last_name,
+    initials: `${initials}.`,
+    company:'DSWD',
+    userprincipalname:`${username}@staging.local`,
+    samaccountname: username,
+    password: payload.password
+  }
+  // Create Active Directory Account
+  await userAccountStore.createAdUser(userAdPayload)
+
+  payload.cn = `${payload.first_name} ${initials} ${payload.last_name}`
+  payload.gmail = `${username}@dev.dx-dswd.com`
+  
   const response = await userStore.createUser(payload, props.currentRoleFilter)
+
   // Handle the API error
   if (!response.success) {
     const result = parseApiResponseError(response)
@@ -198,7 +237,6 @@ const handleFormSubmission = async () => {
     showErrorAlert.value = true
     errorMessage.value = result.message
     errorDetails.value = result.errors
-
     formIsSubmitting.value = false
     return document.getElementsByClassName('create-user-creds-section')[0]?.scrollIntoView({ behavior: 'smooth' })
   }

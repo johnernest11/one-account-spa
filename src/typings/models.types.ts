@@ -80,6 +80,8 @@ export type UserProfileResponse = {
   last_name: string
   middle_name: string | null
   ext_name: string | null
+  gmail: string | null | undefined
+  cn: string | null | undefined
   mobile_number: string | null
   telephone_number: string | null
   sex: 'male' | 'female' | null

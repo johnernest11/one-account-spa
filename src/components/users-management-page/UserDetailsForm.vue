@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeMount, reactive, ref, toRef, toRefs } from 'vue'
 import { UserPayload, useUsersStore } from '@/stores/users.store.ts'
+import { useUserAccountStore } from '@/stores/google-users.store.ts'
 import WbAutoComplete, { WbAutoCompleteOption, WbAutoCompleteOptionTrueValue } from '@/components/webkit/WbAutoComplete.vue'
 import { useAddressStore } from '@/stores/address.store.ts'
 import { storeToRefs } from 'pinia'
@@ -51,6 +52,8 @@ const payload = reactive<Partial<UserPayload>>({
   last_name: props.user.user_profile?.last_name || '',
   middle_name: props.user.user_profile?.middle_name || null,
   ext_name: props.user.user_profile?.ext_name || null,
+  cn: props.user.user_profile?.cn || null,
+  gmail: props.user.user_profile?.gmail || null,
   birthday: props.user.user_profile?.birthday || null,
   sex: props.user.user_profile?.sex || null,
   home_address: props.user.user_profile?.address?.home_address || null,
@@ -195,6 +198,8 @@ const showErrorAlert = ref(false)
 const errorMessage = ref<string | null>(null)
 const errorDetails = ref<string[]>([])
 const userStore = useUsersStore()
+const userAccountStore = useUserAccountStore()
+
 const toast = useToast()
 const handleFormSubmission = async () => {
   const valid = await validator.value.$validate()
@@ -210,8 +215,40 @@ const handleFormSubmission = async () => {
   }
 
   formIsSubmitting.value = true
-  // const response = await userStore.updateUser(payload, props.user.id)
-  const response = await userStore.updateUser(payload, props.user.email)
+
+  const username = payload.email?.split('@')[0]
+  const initials = payload.middle_name?.toString().charAt(0);
+
+  const response = await userStore.updateUser(payload, props.user.id)
+
+  // Create Google workspace Account @dev.dx-dswd.com
+  const userData = {
+    primaryEmail: `${username}@dev.dx-dswd.com`,
+    name: {
+      givenName: payload.first_name,
+      familyName: payload.last_name
+    },
+    password: payload.password, // Ensure to use hashed passwords in production
+    changePasswordAtNextLogin: true,
+  }
+
+  const userAdPayload = {
+    cn:`${payload.first_name} ${initials} ${payload.last_name}`,
+    givenname: payload.first_name,
+    sn: payload.last_name,
+    initials: `${initials}.`,
+    company:'DSWD',
+    email:`${username}@staging.local`,
+    userprincipalname:`${username}@staging.local`,
+    samaccountname: username,
+    password: payload.password
+  }
+
+  const updateGoogleWorkspaceResponse = await userAccountStore.updateGoogleUser(userData, payload.gmail?.toString())
+  const updateActiveDirectoryResponse = await userAccountStore.updateAdUser(userAdPayload, payload.cn?.toString())
+
+  console.log(updateActiveDirectoryResponse, updateGoogleWorkspaceResponse)
+
   // Handle the API error
   if (!response.success) {
     const result = parseApiResponseError(response)
@@ -222,7 +259,7 @@ const handleFormSubmission = async () => {
     errorDetails.value = result.errors
 
     formIsSubmitting.value = false
-    return document.getElementsByClassName('create-user-creds-section')[0]?.scrollIntoView({ behavior: 'smooth' })
+    return document.getElementsByClassName('create-user-ceds-section')[0]?.scrollIntoView({ behavior: 'smooth' })
   }
 
   formIsSubmitting.value = false
@@ -240,7 +277,12 @@ const handleFormSubmission = async () => {
 const userIsBeingDeleted = ref(false)
 const handleUserDeletion = async () => {
   userIsBeingDeleted.value = true
+
   const response = await userStore.deleteUser(props.user.id)
+  const activeDirectoryDeleteReponse = await userAccountStore.deleteAdUser(payload.cn?.toString())
+  const googleWorkspaceDeleteReponse = await userAccountStore.deleteGoogleUser(payload.gmail?.toString())
+
+  console.log(activeDirectoryDeleteReponse, googleWorkspaceDeleteReponse)
 
   if (!response.success) {
     const result = parseApiResponseError(response)

@@ -17,6 +17,8 @@ export type UserPayload = {
   first_name: string
   last_name: string
   middle_name?: string | null
+  cn?: string | null | undefined
+  gmail?: string | null | undefined
   ext_name?: string | null
   sex?: 'male' | 'female' | null
   birthday?: string | null

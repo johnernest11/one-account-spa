@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
-import { UserPayload, useGoogleUsersStore } from '@/stores/google-users.store.ts'
+import { UserPayload, useUserAccountStore } from '@/stores/google-users.store.ts'
 import useVuelidate from '@vuelidate/core'
 import { email, helpers, maxLength, minLength, required, sameAs } from '@vuelidate/validators'
 import { mobilePhoneRule, passwordRule, uniqueUserIdentifierRule } from '@/utils/custom-validations.ts'
@@ -66,7 +66,7 @@ const formIsSubmitting = ref(false)
 const showErrorAlert = ref(false)
 const errorMessage = ref<string | null>(null)
 const errorDetails = ref<string[]>([])
-const userStore = useGoogleUsersStore()
+const userStore = useUserAccountStore()
 const toast = useToast()
 
 /** Emits */
@@ -101,7 +101,7 @@ const handleFormSubmission = async () => {
     changePasswordAtNextLogin: true,
   }
   // Create Google workspace Account
-  const responseGoogle = await userStore.createUser(userData)
+  const responseGoogle = await userStore.createGoogleUser(userData)
 
   const userAdPayload = {
     cn:`${payload.first_name} ${payload.last_name}`,
@@ -112,24 +112,24 @@ const handleFormSubmission = async () => {
     userprincipalname:"dptan@staging.local",
     samaccountname:"dptan",
     password: payload.password
-}
-
-  // Create AD Account
-  const responseAd = await userStore.createAdUser(userAdPayload)
-  console.log(responseAd)
-
-  // Handle the API error
-  if (!responseGoogle.success) {
-    const result = parseApiResponseError(responseGoogle)
-    if (!result) return (formIsSubmitting.value = false)
-
-    showErrorAlert.value = true
-    errorMessage.value = result.message
-    errorDetails.value = result.errors
-
-    formIsSubmitting.value = false
-    return document.getElementsByClassName('create-user-creds-section')[0]?.scrollIntoView({ behavior: 'smooth' })
   }
+
+// Create AD Account
+const responseAd = await userStore.createAdUser(userAdPayload)
+console.log(responseAd)
+
+// Handle the API error
+if (!responseGoogle.success) {
+  const result = parseApiResponseError(responseGoogle)
+  if (!result) return (formIsSubmitting.value = false)
+
+  showErrorAlert.value = true
+  errorMessage.value = result.message
+  errorDetails.value = result.errors
+
+  formIsSubmitting.value = false
+  return document.getElementsByClassName('create-user-creds-section')[0]?.scrollIntoView({ behavior: 'smooth' })
+}
 
   formIsSubmitting.value = false
   toast.add({
