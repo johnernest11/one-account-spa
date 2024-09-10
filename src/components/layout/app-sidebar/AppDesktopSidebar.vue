@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import AppLogo from '@/components/layout/AppLogo.vue'
 import { RouterLink } from 'vue-router'
 import { useSidebarNavLinks } from '@/composables/sidebar.ts'
 
@@ -9,8 +8,8 @@ const { navLinks } = useSidebarNavLinks()
 <template>
   <div class="h-100% flex flex-col bg-surface-0 dark:bg-surface-900">
     <!-- Start Logo -->
-    <div class="flex justify-center border-b border-surface-200 px-12 py-6 dark:border-surface-900">
-      <AppLogo />
+    <div class="flex justify-start border-b border-surface-200 px-12 py-6 dark:border-surface-900">
+      <img src="/DSWDUNO.png" width="150" class="ml-4" />
     </div>
     <!-- End Logo -->
     <!-- Start Nav Items -->
@@ -27,7 +26,7 @@ const { navLinks } = useSidebarNavLinks()
               :key="link.label"
               :to="{ name: link.name }"
               :class="`flex transform items-center rounded-lg px-3 py-2 transition-colors duration-300 hover:bg-primary-100 hover:text-primary-900 dark:text-surface-200 dark:hover:bg-primary-400/70 ${
-                $route.name === link.name ? 'bg-primary-100 text-primary-900 dark:!bg-primary-400/70 dark:!text-surface-200' : ''
+                $route.name === link.name ? 'bg-primary-200 text-primary-900 dark:!bg-primary-400/70 dark:!text-surface-200' : ''
               }`"
             >
               <i :class="link.icon"></i>

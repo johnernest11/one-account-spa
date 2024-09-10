@@ -1,239 +1,50 @@
 <script setup lang="ts">
-import WbInputText from '@/components/webkit/WbInputText.vue'
-import Message from 'primevue/message'
-import Button from 'primevue/button'
-import WbPassword from '@/components/webkit/WbPassword.vue'
-import { reactive, ref } from 'vue'
-import useVuelidate from '@vuelidate/core'
-import { helpers, required } from '@vuelidate/validators'
-import { useRoute, useRouter } from 'vue-router'
-import { LoginPayload, useAuthStore } from '@/stores/auth.store.ts'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import AppLogo from '@/components/layout/AppLogo.vue'
-import { checkIfValidMobileNumber } from '@/utils/helpers.ts'
-import { ApiErrorCode } from '@/typings/http-resources.types.ts'
-import { useSettingsStore } from '@/stores/settings.store.ts'
+import { ref } from 'vue'
+// import Steps from 'primevue/steps'
 
-/** Emits */
-const emit = defineEmits<{
-  (e: 'onCredentialsError', value: boolean): void
-}>()
+import LoginSection from '@/components/auth-page/login-form/LoginFormEmail.vue'
+import EmailSection from '@/components/auth-page/login-form/LoginFormPassword.vue'
 
-/** Props */
-const props = withDefaults(defineProps<{ showLoginExpiredAlert: boolean }>(), {
-  showLoginExpiredAlert: false,
-})
-
-const route = useRoute()
-/** Payload */
-const payload = reactive<LoginPayload>({
-  email: (route.query.email as string) || '',
-  password: '',
-})
-
-/** Form Validation */
-const formRules = {
-  $lazy: true,
-  email: {
-    required: helpers.withMessage('Enter your email or mobile number', required),
-  },
-  password: {
-    required: helpers.withMessage('Enter your password', required),
-  },
+/** Component States */
+const activeStep = ref(0)
+// const registrationSteps = ref([
+//   {
+//     label: 'Email Confirmation',
+//   },
+//   {
+//     label: 'Password',
+//   },
+// ])
+/** UI Handlers */
+const handleNextButtonClicked = () => {
+  activeStep.value++
 }
-const validator = useVuelidate<LoginPayload>(formRules, payload)
-
-/** Form Submission */
-const formIsSubmitting = ref(false)
-const showCredsErrorAlert = ref(false)
-const credsErrorMessage = ref('')
-const router = useRouter()
-const authStore = useAuthStore()
-const settingsStore = useSettingsStore()
-const handleLogin = async () => {
-  formIsSubmitting.value = true
-  const valid = await validator.value.$validate()
-  if (!valid) return (formIsSubmitting.value = false)
-
-  const newPayload = manageIfEmailIsPhoneNumber(Object.assign({}, payload))
-  const res = await authStore.login(newPayload)
-
-  // Handle unsuccessful login attempt
-  if (!res.success) {
-    formIsSubmitting.value = false
-    showCredsErrorAlert.value = true
-
-    switch (res.error_code) {
-      case ApiErrorCode.INVALID_CREDENTIALS_ERROR:
-      case ApiErrorCode.VALIDATION_ERROR:
-        credsErrorMessage.value = "The credentials you've entered are incorrect"
-        break
-      case ApiErrorCode.FORBIDDEN_ERROR:
-        credsErrorMessage.value =
-          "We're sorry, but your account login is currently disabled. To reactivate your account, please contact support."
-        break
-      case ApiErrorCode.TOO_MANY_REQUESTS_ERROR:
-        credsErrorMessage.value = "We've received too many attempts from you. Please try again after a few minutes."
-        break
-      default:
-        credsErrorMessage.value = 'Unable to login to your account. Please contact our support team.'
-    }
-
-    emit('onCredentialsError', true)
-    return
-  }
-
-  formIsSubmitting.value = false
-
-  // Handle Login -> MFA Guard -> Verify Account flow if MFA is enabled
-  if (route.query.from === 'verify-account' && settingsStore.mfaIsEnabled) {
-    return await router.replace({
-      name: 'mfa-guard-page',
-      query: {
-        from: route.query.from,
-        id: route.query.id,
-        hash: route.query.hash,
-        expires: route.query.expires,
-        signature: route.query.signature,
-      },
-    })
-  }
-
-  // Handle Login -> Verify Account flow if MFA is disabled
-  if (route.query.from === 'verify-account' && !settingsStore.mfaIsEnabled) {
-    return await router.replace({
-      name: route.query.from,
-      params: {
-        id: route.query.id as string,
-        hash: route.query.hash as string,
-      },
-      query: {
-        expires: route.query.expires,
-        signature: route.query.signature,
-      },
-    })
-  }
-
-  // If MFA is enabled, the mfa_token and mfa_steps will be populated
-  // and the user is not authenticated
-  if (authStore.mfaToken && !authStore.isAuthenticated) {
-    return await router.replace({
-      name: 'mfa-guard-page',
-      query: {
-        from: route.query.from,
-      },
-    })
-  }
-
-  // Redirect to the `from` route if it exists
-  if (route.query.from) {
-    return await router.replace({ name: route.query.from as string })
-  }
-
-  // For normal log-ins, we go the dashboard page for verified emails, and to the guard page for those who
-  // have un-verified emails
-  if (authStore.authenticatedUser.email_verified_at) {
-    return await router.replace({ name: 'dashboard' })
-  } else {
-    return await router.replace({ name: 'verify-email-guard' })
-  }
-}
-
-const manageIfEmailIsPhoneNumber = (payload: LoginPayload) => {
-  if (checkIfValidMobileNumber(payload.email || '')) {
-    payload.mobile_number = payload.email
-    delete payload.email
-  }
-  return payload
+const handlePreviousButtonClicked = () => {
+  activeStep.value--
 }
 </script>
-
 <template>
-  <section class="bg-transparent">
-    <div class="text-center text-surface-0 lg:text-surface-800">
-      <div class="mb-2 mt-6 flex justify-center lg:hidden">
-        <AppLogo color="light"></AppLogo>
-      </div>
-      <h2 class="font-menu text-2xl font-bold text-surface-0 md:text-3xl lg:mt-6 lg:text-surface-800 dark:lg:text-surface-0">
-        Account Login
-      </h2>
-      <p class="mb-4 mt-2 text-sm text-surface-0 lg:text-surface-500 dark:lg:text-surface-200">
-        Sign in to your existing account
-      </p>
+  <section>
+    <div class="text-surface text-center lg:text-surface-800">
+      <img src="/DesignTop.png" class="mx-auto" style="position: absolute; top: 0; width: 100%" />
+      <img src="/DesignBelow.png" class="mx-auto" style="position: absolute; bottom: 0; width: 100%" />
+      <img src="/DSWDUNO.png" width="150" class="mx-auto" />
+      <div class="mb-2 mt-2 flex"></div>
+      <div class="mb-2 mt-2 flex"></div>
+      <h5 class="text-md mb-2 mt-2 text-blue-900">Sign In to continue to <b>Record</b></h5>
+      <h3 class="text-md mb-2 mt-2 text-blue-900">
+        <b> Managemnent and</b>
+      </h3>
+      <h1 class="text-md mb-2 mt-2 text-blue-900">
+        <b> Disposition Information System</b>
+      </h1>
     </div>
-    <!-- Start Alert Message -->
-    <transition enter-active-class="transition duration-200" enter-from-class="scale-50 opacity-0" leave-to-class="opacity-0">
-      <Message v-if="showCredsErrorAlert" :closable="false" severity="error">
-        <span>{{ credsErrorMessage }}</span>
-      </Message>
-    </transition>
-    <!-- End Alert Message -->
-    <!-- Start Auth Token Expired Message -->
-    <transition enter-active-class="transition duration-200" enter-from-class="scale-50 opacity-0" leave-to-class="opacity-0">
-      <Message v-if="props.showLoginExpiredAlert && !showCredsErrorAlert" :closable="false" severity="warn">
-        <span>Your login session has expired, please enter your credentials again to continue.</span>
-      </Message>
-    </transition>
-    <!-- End Auth Token Expired Message -->
-    <!-- Start Form -->
-    <form class="mt-8 flex flex-col space-y-6" @submit.prevent>
-      <WbInputText
-        v-model="payload.email"
-        label="Email or mobile number"
-        :invalid="validator.email.$invalid"
-        :invalid-text="validator.email.$errors[0]?.$message"
-        label-class="text-xs text-surface-0 lg:text-surface-800 dark:lg:text-surface-200"
-        validation-error-message-class="text-xs text-error-300 font-bold lg:font-normal lg:text-error-500 dark:lg:text-error-300"
-      >
-        <template #prepend-icon>
-          <i class="pi pi-envelope" />
-        </template>
-      </WbInputText>
-      <WbPassword
-        v-model="payload.password"
-        label="Password"
-        :feedback="false"
-        toggleMask
-        :invalid="validator.password.$invalid"
-        :invalid-text="validator.password.$errors[0]?.$message"
-        @keyup.enter="handleLogin"
-        label-class="text-xs text-surface-0 lg:text-surface-800 dark:lg:text-surface-200"
-        validation-error-message-class="text-xs text-error-300 font-bold lg:font-normal lg:text-error-500 dark:lg:text-error-300"
-      >
-        <template #prepend-icon>
-          <i class="pi pi-lock" />
-        </template>
-      </WbPassword>
-      <div>
-        <Button @click="handleLogin" label="Sign in" size="large" class="mt-3 w-full" :loading="formIsSubmitting"></Button>
-      </div>
-      <p class="flex justify-between pt-3 text-center">
-        <Button
-          label="Forgot Password"
-          size="small"
-          class="text-xs text-surface-0 hover:bg-surface-100 dark:text-primary-100 dark:hover:bg-primary-300/20 lg:text-surface-500 dark:lg:text-primary-400"
-          text
-          @click="$router.push({ name: 'forgot-password' })"
-        >
-          <template #icon>
-            <FontAwesomeIcon icon="fa-solid fa-lock" class="mr-1.5" />
-          </template>
-        </Button>
-        <Button
-          label="Create an account"
-          size="small"
-          class="text-xs text-surface-0 dark:text-primary-100 lg:text-primary-400 dark:lg:text-primary-400"
-          text
-          @click="$router.push({ name: 'sign-up' })"
-        >
-          <template #icon>
-            <FontAwesomeIcon icon="fa-solid fa-right-to-bracket" class="mr-1.5" />
-          </template>
-        </Button>
-      </p>
-    </form>
-    <!-- End Form -->
+    <!-- <Steps v-model:active-step="activeStep" :model="registrationSteps" /> -->
+    <div class="mt-4">
+      <form @submit.prevent>
+        <LoginSection key="0" v-if="activeStep === 0" @next-button-clicked="handleNextButtonClicked" />
+        <EmailSection key="1" v-else-if="activeStep === 1" @previous-button-clicked="handlePreviousButtonClicked" />
+      </form>
+    </div>
   </section>
 </template>
-
-<style scoped></style>

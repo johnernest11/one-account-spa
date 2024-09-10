@@ -7,7 +7,7 @@ import Button from 'primevue/button'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import WbCalendar from '@/components/webkit/WbCalendar.vue'
 import WbDropdown from '@/components/webkit/WbDropdown.vue'
-import { RegistrationPersonalInfoPayload, useFormsStore } from '@/stores/forms.store.ts'
+import { RegistrationPersonalInfoPayload, RegistrationCredentialsPayload, useFormsStore } from '@/stores/forms.store.ts'
 
 /** Payload */
 const formStore = useFormsStore()
@@ -20,6 +20,12 @@ const payload = reactive<RegistrationPersonalInfoPayload>({
   birthday: formStore.registrationInfo.personal_info?.birthday || null,
 })
 
+const payloads = reactive<RegistrationCredentialsPayload>({
+  email: formStore.registrationInfo.credentials?.email || null,
+  mobile_number: formStore.registrationInfo.credentials?.mobile_number || null,
+  password: formStore.registrationInfo.credentials?.password || null,
+  password_confirmation: formStore.registrationInfo.credentials?.password || null,
+})
 /** Component States */
 const genderOptions = ref([
   { value: 'male', label: 'Male' },
@@ -69,6 +75,17 @@ const handleNextSection = async () => {
   <div class="flex flex-col gap-4">
     <!-- Start First name and Middle name -->
     <div class="flex flex-col gap-4 md:flex-row">
+      <WbInputText
+        v-model="payloads.email"
+        placeholder="you@example.com"
+        label="Email *"
+        label-class="text-xs text-surface-0 lg:text-surface-800 dark:lg:text-surface-200"
+        validation-error-message-class="text-xs text-error-300 font-bold lg:font-normal lg:text-error-500 dark:lg:text-error-300"
+      >
+        <template #prepend-icon>
+          <i class="pi pi-envelope" />
+        </template>
+      </WbInputText>
       <WbInputText
         v-model="payload.first_name"
         label="First name *"

@@ -4,13 +4,13 @@ import Button from 'primevue/button'
 import { ref } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import { useAuthStore } from '@/stores/auth.store.ts'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 const props = defineProps({
   mfaName: String,
   stepsStatus: String,
   verifyCode: Function,
   isFirstMfaStep: Boolean,
+  email: String,
 })
 
 /** Handle MFA code verification **/
@@ -83,64 +83,61 @@ const handleResendMfaCode = async () => {
 <template>
   <div class="w-full">
     <!-- Start Form Title -->
-    <h1 class="text-md self-start font-menu text-surface-800 dark:text-surface-100 sm:text-lg md:text-xl">
-      <span>{{ props.stepsStatus }}</span>
-      {{ props.mfaName }}: Multi-Factor Authentication
-    </h1>
-    <!-- End Form Title -->
-    <div class="flex w-full flex-col text-surface-600">
-      <!-- Start Form Caption -->
-      <p v-if="props.isFirstMfaStep" class="my-2 text-sm leading-relaxed dark:text-surface-100">
-        We've sent a six-digit one-time-password sent to your inbox. Please enter the code to proceed.
-      </p>
-      <p v-else class="my-2 text-sm leading-relaxed dark:text-surface-100">
-        Use the <b>Send OTP</b> button to receive a six-digit one-time-password. Please enter the code to proceed.
-      </p>
-      <!-- End Form Caption -->
-      <!-- Start Code Input -->
-      <div class="mt-4 flex justify-center">
-        <InputOtp v-model="mfaCode" :length="6" style="gap: 0">
-          <template #default="{ attrs, events, index }">
-            <input type="text" v-bind="attrs" v-on="events" class="otp-input" />
-            <div v-if="index === 3" class="px-3">
-              <i class="pi pi-minus" />
-            </div>
-          </template>
-        </InputOtp>
-      </div>
-      <!-- End Code Input -->
-      <!-- Start Action Buttons -->
-      <div class="mt-6 flex flex-col items-start justify-between gap-y-4 md:flex-row lg:mt-8">
-        <div class="mt-4 flex w-full flex-col sm:items-start md:mt-0">
-          <Button
-            :disabled="resendMfaCodeButtonIsLocked"
-            :loading="mfaCodeIsBeingResent"
-            @click="handleResendMfaCode"
-            severity="secondary"
-            :label="`${props.isFirstMfaStep ? 'Re-send OTP' : 'Send OTP'}`"
-            class="w-full sm:w-fit"
-          >
-            <template #icon>
-              <FontAwesomeIcon icon="fa-solid fa-paper-plane" class="mr-2" />
-            </template>
-          </Button>
-          <p v-if="resendMfaCodeButtonIsLocked" class="mt-1 text-center text-xs italic text-surface-600 sm:mt-3 lg:text-sm">
-            You can send again after <span class="font-bold">{{ resendMfaCodeButtonTimer }}</span> seconds
-          </p>
+    <div class="text-center text-surface-0 lg:text-surface-800">
+      <div class="mb-12 mt-12 flex"></div>
+      <div class="mb-12 mt-12 flex"></div>
+      <img src="/DSWDUNO.png" width="150" class="mx-auto" />
+      <h5 class="text-md mb-0 mt-0 text-blue-900">
+        <b>Multi-Factor Authentication</b>
+      </h5>
+      <h3 class="text-md mb-0 mt-0 text-blue-900">
+        <span>{{ props.stepsStatus }}</span>
+        <b> {{ props.mfaName }} </b>
+      </h3>
+      <!-- End Form Title -->
+      <div class="flex w-full flex-col text-surface-600">
+        <!-- Start Form Caption -->
+        <p v-if="props.isFirstMfaStep" class="my-2 text-sm leading-relaxed dark:text-surface-100">
+          We have sent a six-digit one-time-password (OTP) to your email.{{ props.email }} . Not you?.
+        </p>
+        <p v-else class="my-2 text-sm leading-relaxed dark:text-surface-100">
+          Use the <b>Send OTP</b> button to receive a six-digit one-time-password. Please enter the code to proceed.
+        </p>
+        <!-- End Form Caption -->
+        <!-- Start Code Input -->
+        <div class="mt-4 flex justify-center">
+          <InputOtp v-model="mfaCode" :length="6" integerOnly />
         </div>
-        <Button
-          :loading="mfaCodeIsBeingVerified"
-          @click="handleCodeVerification(mfaCode)"
-          :disabled="!mfaCode"
-          label="Verify Code"
-          class="w-full sm:w-40"
-        >
-          <template #icon>
-            <FontAwesomeIcon icon="fa-solid fa-key" class="mr-2" />
-          </template>
-        </Button>
+        <!-- End Code Input -->
+        <!-- Start Action Buttons -->
+        <div class="mt-4 flex flex-col items-start md:flex-row">
+          <div class="mt-4 flex w-full flex-col sm:items-start md:mt-0">
+            <p>Did not receive the OTP?</p>
+            <Button
+              :disabled="resendMfaCodeButtonIsLocked"
+              :loading="mfaCodeIsBeingResent"
+              @click="handleResendMfaCode"
+              :label="`${props.isFirstMfaStep ? 'Re-send OTP' : 'Send OTP'}`"
+              class="text-xs text-surface-0 hover:bg-surface-100 dark:text-primary-100 dark:hover:bg-primary-300/20 lg:text-surface-500 dark:lg:text-primary-400"
+              size="small"
+              outlined
+            >
+            </Button>
+            <p v-if="resendMfaCodeButtonIsLocked" class="mt-1 text-center text-xs italic text-surface-600 sm:mt-3 lg:text-sm">
+              You can send again after <span class="font-bold">{{ resendMfaCodeButtonTimer }}</span> seconds
+            </p>
+          </div>
+          <Button
+            :loading="mfaCodeIsBeingVerified"
+            @click="handleCodeVerification(mfaCode)"
+            :disabled="!mfaCode"
+            label="Verify Code"
+            class="w-full bg-blue-900 text-white sm:w-40"
+          >
+          </Button>
+        </div>
+        <!-- End Action Buttons -->
       </div>
-      <!-- End Action Buttons -->
     </div>
   </div>
 </template>

@@ -22,7 +22,7 @@ const routes = [
     component: Dashboard,
     meta: <RouteMeta>{
       group: RouteGroup.HOME,
-      label: 'Dashboard',
+      label: 'Home',
       isSidebarMenu: true,
       authType: AuthType.AUTHENTICATED,
       roles: [AuthRole.STANDARD_USER, AuthRole.ADMIN, AuthRole.SYSTEM_SUPPORT, AuthRole.SUPER_USER],
@@ -34,7 +34,7 @@ const routes = [
     component: ProfilePage,
     meta: <RouteMeta>{
       group: RouteGroup.HOME,
-      label: 'Profile',
+      label: 'Profile Information',
       isSidebarMenu: true,
       authType: AuthType.AUTHENTICATED,
       roles: [AuthRole.STANDARD_USER, AuthRole.ADMIN, AuthRole.SYSTEM_SUPPORT, AuthRole.SUPER_USER],
@@ -46,7 +46,7 @@ const routes = [
     component: AnnouncementsPage,
     meta: <RouteMeta>{
       group: RouteGroup.HOME,
-      label: 'Announcements',
+      label: 'User',
       isSidebarMenu: true,
       authType: AuthType.AUTHENTICATED,
       roles: [AuthRole.STANDARD_USER, AuthRole.ADMIN, AuthRole.SYSTEM_SUPPORT, AuthRole.SUPER_USER],

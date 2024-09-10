@@ -78,7 +78,7 @@ export const uniqueUserIdentifierRule =
       }
 
       const res = await availabilityStore.checkUserUniqueIdentifierAvailability(key, value, excludedId || null)
-      return res.data.is_available
+      return !res.data.is_available
     }
 
 /** @description Only allow certain file extensions **/
