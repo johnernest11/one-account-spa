@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import Paginator, { PageState } from 'primevue/paginator'
 import Button from 'primevue/button'
-import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext'
 import InputGroup from 'primevue/inputgroup'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import { useToast } from 'primevue/usetoast'
 import Dialog from 'primevue/dialog'
+import { useToast } from 'primevue/usetoast'
 import { UserResponse } from '@/typings/models.types.ts'
 import { onBeforeMount, ref, watch } from 'vue'
 import { useUsersStore } from '@/stores/users.store.ts'
@@ -17,7 +16,7 @@ import CreateUserForm from '@/components/users-management-page/CreateUserForm.vu
 import UserDetailsForm from '@/components/users-management-page/UserDetailsForm.vue'
 
 /** Initial Users Fetch & Role Options */
-const props = defineProps<{ user: UserResponse; roleFilter: number | string | null }>()
+const prop = defineProps<{ user: UserResponse; roleFilterUser: number | string | null }>()
 const usersStore = useUsersStore()
 const usersListIsLoading = ref(false)
 const rolesStore = useRolesStore()
@@ -25,7 +24,7 @@ const rolesOptionsIsLoading = ref(false)
 const paginationLimit = 12
 onBeforeMount(async () => {
   usersListIsLoading.value = true
-  const response = await usersStore.fetchUsers(roleFilter.value, paginationLimit)
+  const response = await usersStore.fetchUsers(searchQuery.value, paginationLimit)
   if (response.success && response.pagination) {
     pagination.value = response.pagination
   }
@@ -42,7 +41,7 @@ const handlePaginationPageChange = async (event: PageState) => {
   const pageSelected = event.page + 1 // The page state object starts at 0
 
   usersListIsLoading.value = true
-  const response = await usersStore.fetchUsers(roleFilter.value, paginationLimit, pageSelected)
+  const response = await usersStore.fetchUsers(searchQuery.value, paginationLimit, pageSelected)
 
   if (response.success && response.pagination) {
     pagination.value = response.pagination
@@ -56,14 +55,13 @@ const showCreateUserDialog = ref(false)
 const toggleCreateUserDialog = () => (showCreateUserDialog.value = !showCreateUserDialog.value)
 
 /** Search and Filters */
-const roleFilter = ref<number | null>(null)
 const searchQuery = ref<string | null>(null)
 watch(
-  () => roleFilter.value,
+  () => searchQuery.value,
   async () => {
     usersListIsLoading.value = true
     searchQuery.value = null // We clear the search query
-    const response = await usersStore.fetchUsers(roleFilter.value, paginationLimit)
+    const response = await usersStore.fetchUsers(searchQuery.value, paginationLimit)
     if (response.success && response.pagination) {
       pagination.value = response.pagination
     }
@@ -76,7 +74,7 @@ const handleSearchUser = async () => {
   // We do regular fetch if the query is null / empty
   usersListIsLoading.value = true
   if (!searchQuery.value) {
-    const response = await usersStore.fetchUsers(roleFilter.value, paginationLimit)
+    const response = await usersStore.fetchUsers(searchQuery.value, paginationLimit)
     if (response.success && response.pagination) {
       pagination.value = response.pagination
     }
@@ -87,7 +85,7 @@ const handleSearchUser = async () => {
   const response = await usersStore.searchUsers(searchQuery.value)
   if (response.success && response.pagination) {
     pagination.value = response.pagination
-    roleFilter.value = null
+    searchQuery.value = null
     toast.add({
       severity: 'success',
       summary: 'Search Users',
@@ -132,26 +130,11 @@ const toggleUserDetailsDialog = () => (showUserDetailsDialog.value = !showUserDe
         maximizable
         class="mx-2 w-full sm:mx-0"
       >
-        <CreateUserForm :current-role-filter="roleFilter" @user-created="toggleCreateUserDialog" />
+        <CreateUserForm :current-role-filter="roleFilterUser" @user-created="toggleCreateUserDialog" />
       </Dialog>
       <!-- End Create User Button -->
       <!-- Start Filter & Search Inputs -->
       <div class="flex w-full flex-col justify-end gap-4 md:flex-row">
-        <Dropdown
-          v-model="roleFilter"
-          :loading="rolesOptionsIsLoading"
-          :disabled="rolesOptionsIsLoading"
-          :options="rolesStore.roleOptions"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Filter by Role"
-          show-clear
-          class="md:min-w-52"
-        >
-          <template #loadingicon>
-            <i class="pi pi-spinner mr-2 animate-spin" />
-          </template>
-        </Dropdown>
         <InputGroup v-model="searchQuery">
           <InputText
             v-model="searchQuery"
@@ -224,7 +207,7 @@ const toggleUserDetailsDialog = () => (showUserDetailsDialog.value = !showUserDe
       maximizable
       class="mx-2 w-full sm:mx-0"
     >
-      <UserDetailsForm :user="props.user" :current-role-filter="props.roleFilter" @user-updated="toggleUserDetailsDialog" />
+      <UserDetailsForm :user="prop.user" :current-role-filter="prop.roleFilterUser" @user-updated="toggleUserDetailsDialog" />
     </Dialog>
     <!-- End Update-User Dialog -->
 

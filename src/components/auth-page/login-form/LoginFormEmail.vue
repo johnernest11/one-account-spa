@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import WbInputText from '@/components/webkit/WbInputText.vue'
-import { reactive, ref } from 'vue'
+import { reactive } from 'vue'
 import useVuelidate from '@vuelidate/core'
 import { helpers, required, email } from '@vuelidate/validators'
 import { uniqueUserIdentifierRule } from '@/utils/custom-validations.ts'
@@ -17,8 +17,6 @@ const payload = reactive<LoginEmailPayload>({
 /** Events */
 const emits = defineEmits(['nextButtonClicked'])
 const toast = useToast()
-// Flag to control showing email error toast
-const shouldShowEmailToast = ref(false)
 
 /** Form Validation */
 const formRules = {
@@ -26,36 +24,34 @@ const formRules = {
   email: {
     required: helpers.withMessage('Please enter your email address', required),
     email: helpers.withMessage('Email format is invalid', email),
-    unique: helpers.withAsync(helpers.withMessage('', uniqueUserIdentifierRule('email')), async () => {
-      const isValidEmail = payload.email // Check email validity (assuming a validation method)
-
-      const isValid = await uniqueUserIdentifierRule('email') // Check for unique identifier
-
-      // Combine checks for both email validity and unique identifier
-      const showToast = isValid && shouldShowEmailToast.value && isValidEmail
-
-      if (showToast) {
-        toast.add({
-          severity: 'error',
-          summary: 'Username or Email error',
-          detail: 'We could not find the account associated with the username/email you have provided',
-          life: 5000,
-        })
+    unique: helpers.withAsync(
+      helpers.withMessage('We could not find the account', uniqueUserIdentifierRule('email')),
+      async () => {
+        const isValidEmail = payload.email // Check email validity (assuming a validation method)
+        const isValid = await uniqueUserIdentifierRule('email') // Check for unique identifier
+        return isValid && isValidEmail // Combine checks
       }
-
-      return isValid
-    }),
+    ),
   },
 }
+
 /** Handle Next Section */
 const validator = useVuelidate<LoginEmailPayload>(formRules, payload)
 const handleNextSection = async () => {
-  shouldShowEmailToast.value = true // Set flag before validation
   const valid = await validator.value.$validate()
-  shouldShowEmailToast.value = false // Reset flag after validation
-  if (!valid) return false
+
+  if (!valid) {
+    toast.add({
+      severity: 'error',
+      summary: 'Username or Email error',
+      detail: 'We could not find the account associated with the username/email you have provided',
+      life: 5000,
+    })
+    return // Prevent further processing if validation fails
+  }
+
   formStore.saveLoginEmailSection(payload)
-  emits('nextButtonClicked')
+  emits('nextButtonClicked') // Emit event for successful validation
 }
 </script>
 
