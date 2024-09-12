@@ -18,6 +18,21 @@ import useVuelidate from '@vuelidate/core'
  */
 export const passwordRule = () => helpers.regex(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/)
 
+
+/**
+ * @description Masks an email address by replacing most characters with asterisks,
+ * leaving only the first few characters and the domain visible.
+ */
+export const maskEmail = (email: string, visibleChars: number = 2) => {
+  if (!email) return '';
+
+  const [username, domain] = email.split('@');
+  const maskedDomain = domain.replace(/\./g, '*').replace(/^(.{3})./, '$1*').replace(/^(.{4})./, '$1*').replace(/^(.{5})./, '$1*');
+  const maskedUsername = username.slice(0, visibleChars) + username.slice(visibleChars).replace(/./g, '*');
+
+  return `${maskedUsername}*${maskedDomain}`;
+};
+
 /**
  * @description Must have a certain count of digits
  */
@@ -78,7 +93,7 @@ export const uniqueUserIdentifierRule =
       }
 
       const res = await availabilityStore.checkUserUniqueIdentifierAvailability(key, value, excludedId || null)
-      return res.data.is_available
+      return !res.data.is_available
     }
 
 /** @description Only allow certain file extensions **/

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import AppFooter from '@/components/layout/AppFooter.vue'
 import AppDesktopToolbar from '@/components/layout/app-toolbar/AppDesktopToolbar.vue'
 import AppDesktopSidebar from '@/components/layout/app-sidebar/AppDesktopSidebar.vue'
 import { useGlobalUiStore } from '@/stores/ui.store.ts'
@@ -73,13 +72,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <div id="app-container" class="flex min-h-screen bg-surface-200 font-content dark:bg-surface-950">
+  <div id="app-container" class="flex min-h-screen bg-surface-0 font-content dark:bg-surface-950">
     <AppFullScreenLoader :is-open="showFullScreenLoader" />
     <!-- Start Sidebar -->
     <AppDesktopSidebar
       v-if="!route.meta.hideNavigation"
       :class="`${
-        !uiStore.sidebarMinimized ? 'w-[20%]' : 'w-[0%] -translate-x-96 transform'
+        !uiStore.sidebarMinimized ? 'w-[17%]' : 'w-[0%] -translate-x-96 transform'
       } hidden overflow-hidden transition-all duration-200 lg:flex`"
     ></AppDesktopSidebar>
     <!-- End Sidebar -->
@@ -101,9 +100,6 @@ onMounted(() => {
         </RouterView>
       </div>
       <!-- End Main Content -->
-      <!-- Start Footer -->
-      <AppFooter v-if="!route.meta.hideNavigation" class="mt-6"></AppFooter>
-      <!-- End Footer -->
     </div>
   </div>
 </template>

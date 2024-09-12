@@ -7,10 +7,13 @@ import { UserResponse } from '@/typings/models.types.ts'
 import { RegistrationPayload } from '@/stores/forms.store.ts'
 
 /** Typings */
+export type LoginEmailPayload = {
+  email: string | null
+}
+
 export type LoginPayload = {
-  email?: string
-  mobile_number?: string
-  password: string
+  email: LoginEmailPayload | null
+  password: string | null
   with_user?: boolean
   client_name?: string
 }
@@ -100,6 +103,11 @@ export const useAuthStore = defineStore('auth', () => {
     mergeDefaults: true,
   })
 
+  const loginInfo = ref<LoginPayload>({
+    email: null,
+    password: null,
+  })
+
   /** Computed / Getters */
   const isAuthenticated = computed(() => {
     return !!authenticatedUser.value && !!authenticationToken.value && !authExpired.value
@@ -174,6 +182,10 @@ export const useAuthStore = defineStore('auth', () => {
   })
 
   /** Actions */
+  const saveLoginEmailSection = (model: LoginEmailPayload) => {
+    loginInfo.value.email = model
+  }
+
   const login = async (payload: LoginPayload) => {
     payload.with_user = true
     payload.client_name = 'Web Browser'
@@ -356,6 +368,8 @@ export const useAuthStore = defineStore('auth', () => {
     authHasRequiredRole,
     authFullName,
     authFullAddress,
+    loginInfo,
+    saveLoginEmailSection,
     login,
     register,
     logout,
