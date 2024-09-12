@@ -72,13 +72,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <div id="app-container" class="bg-surface-000 flex min-h-screen font-content dark:bg-surface-950">
+  <div id="app-container" class="flex min-h-screen bg-surface-0 font-content dark:bg-surface-950">
     <AppFullScreenLoader :is-open="showFullScreenLoader" />
     <!-- Start Sidebar -->
     <AppDesktopSidebar
       v-if="!route.meta.hideNavigation"
       :class="`${
-        !uiStore.sidebarMinimized ? 'w-[20%]' : 'w-[0%] -translate-x-96 transform'
+        !uiStore.sidebarMinimized ? 'w-[17%]' : 'w-[0%] -translate-x-96 transform'
       } hidden overflow-hidden transition-all duration-200 lg:flex`"
     ></AppDesktopSidebar>
     <!-- End Sidebar -->

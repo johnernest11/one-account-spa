@@ -113,10 +113,10 @@ const stepStatus = computed(() => {
 </script>
 
 <template>
-  <section class="flex h-screen items-center justify-center bg-white">
-    <div class="mx-auto flex flex-col items-center px-0 py-8 md:h-screen lg:py-0">
-      <img src="/DesignTop.png" class="mx-auto" style="position: absolute; top: 0; width: 100%" />
-      <img src="/DesignBelow.png" class="mx-auto" style="position: absolute; bottom: 0; width: 100%" />
+    <div class="relative flex min-h-screen">
+    <div class="mx-auto flex flex-col items-center px-0 py-8 md:h-screen lg:py-0 pt-24">
+      <img src="@/assets/image/DesignTop.png" class="mx-auto" style="position: absolute; top: 0; width: 100%" />
+      <img src="@/assets/image/DesignBelow.png" class="mx-auto" style="position: absolute; bottom: 0; width: 100%" />
       <div class="relative z-10 w-[96%] min-w-[96%] sm:mx-0 sm:w-auto md:min-w-[65%] lg:min-w-[50%]">
         <!-- Start MFA Form -->
         <DeliveryBasedForm
@@ -135,5 +135,5 @@ const stepStatus = computed(() => {
         <!-- End MFA Form -->
       </div>
     </div>
-  </section>
+    </div>
 </template>

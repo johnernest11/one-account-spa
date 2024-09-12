@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import InputOtp from 'primevue/inputotp'
 import Button from 'primevue/button'
-import { ref } from 'vue'
+import { reactive,ref } from 'vue'
 import { useToast } from 'primevue/usetoast'
-import { useAuthStore } from '@/stores/auth.store.ts'
+import { useAuthStore, LoginEmailPayload } from '@/stores/auth.store.ts'
+import { maskEmail } from '@/utils/custom-validations.ts'
 
 const props = defineProps({
   mfaName: String,
@@ -12,6 +13,15 @@ const props = defineProps({
   isFirstMfaStep: Boolean,
   email: String,
 })
+
+/** Payload */
+const formStore = useAuthStore()
+const payloads = reactive<LoginEmailPayload>({
+  email: formStore.loginInfo.email?.email || null,
+})
+
+const MaskEmail = maskEmail(payloads.email); // Outputs: "joh******@example.com"
+
 
 /** Handle MFA code verification **/
 const mfaCode = ref('')
@@ -81,12 +91,10 @@ const handleResendMfaCode = async () => {
 </script>
 
 <template>
-  <div class="w-full">
-    <!-- Start Form Title -->
-    <div class="text-center text-surface-0 lg:text-surface-800">
-      <div class="mb-12 mt-12 flex"></div>
-      <div class="mb-12 mt-12 flex"></div>
-      <img src="/DSWDUNO.png" width="150" class="mx-auto" />
+    <div class="text-center text-surface-0 lg:text-surface-800 ">
+      <div class="flex w-full flex-col text-surface-600 lg:pt-24 sm:pt-0">
+        <img src="@/assets/image/DSWDUNO.png" width="150" class="mx-auto" />
+      </div>
       <h5 class="text-md mb-0 mt-0 text-blue-900">
         <b>Multi-Factor Authentication</b>
       </h5>
@@ -94,34 +102,30 @@ const handleResendMfaCode = async () => {
         <span>{{ props.stepsStatus }}</span>
         <b> {{ props.mfaName }} </b>
       </h3>
-      <!-- End Form Title -->
       <div class="flex w-full flex-col text-surface-600">
-        <!-- Start Form Caption -->
-        <p v-if="props.isFirstMfaStep" class="my-2 text-sm leading-relaxed dark:text-surface-100">
-          We have sent a six-digit one-time-password (OTP) to your email.{{ props.email }} . Not you?.
+        <p v-if="props.isFirstMfaStep" class="my-2 text-sm leading-relaxed dark:text-surface-100 text-blue-900">
+          We have sent a six-digit one-time-password <br> (OTP) to your email <strong>{{ MaskEmail }}</strong><br>
+          <strong class="text-black">Not you?.</strong>
         </p>
         <p v-else class="my-2 text-sm leading-relaxed dark:text-surface-100">
           Use the <b>Send OTP</b> button to receive a six-digit one-time-password. Please enter the code to proceed.
         </p>
-        <!-- End Form Caption -->
-        <!-- Start Code Input -->
         <div class="mt-4 flex justify-center">
           <InputOtp v-model="mfaCode" :length="6" integerOnly />
         </div>
-        <!-- End Code Input -->
-        <!-- Start Action Buttons -->
-        <div class="mt-4 flex flex-col items-start md:flex-row">
+        <div class="mt-4 flex items-center justify-between pt-6">
           <div class="mt-4 flex w-full flex-col sm:items-start md:mt-0">
-            <p>Did not receive the OTP?</p>
+            <p class="text-md ml-2">Did not receive the OTP?</p>
             <Button
               :disabled="resendMfaCodeButtonIsLocked"
               :loading="mfaCodeIsBeingResent"
               @click="handleResendMfaCode"
               :label="`${props.isFirstMfaStep ? 'Re-send OTP' : 'Send OTP'}`"
-              class="text-xs text-surface-0 hover:bg-surface-100 dark:text-primary-100 dark:hover:bg-primary-300/20 lg:text-surface-500 dark:lg:text-primary-400"
+              class="text-md lg:text-blue-900 border-0"
               size="small"
-              outlined
+              text
             >
+              <strong>{{ `${props.isFirstMfaStep ? 'Re-send OTP' : 'Send OTP'}` }}</strong>
             </Button>
             <p v-if="resendMfaCodeButtonIsLocked" class="mt-1 text-center text-xs italic text-surface-600 sm:mt-3 lg:text-sm">
               You can send again after <span class="font-bold">{{ resendMfaCodeButtonTimer }}</span> seconds
@@ -132,12 +136,10 @@ const handleResendMfaCode = async () => {
             @click="handleCodeVerification(mfaCode)"
             :disabled="!mfaCode"
             label="Verify Code"
-            class="w-full bg-blue-900 text-white sm:w-40"
+            class="w-full bg-blue-700 text-white sm:w-40"
           >
           </Button>
         </div>
-        <!-- End Action Buttons -->
-      </div>
+        </div>
     </div>
-  </div>
 </template>

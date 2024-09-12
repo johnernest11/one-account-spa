@@ -10,8 +10,8 @@ import { useAuthStore } from '@/stores/auth.store.ts'
 
 const enum RouteGroup {
   HOME = 'Home',
-  ADMIN_TOOLS = 'Admin Tools',
-  MISC = 'Misc',
+  MANAGE = 'Navigate',
+  OTHER = 'Other',
   AUTH = 'Auth',
 }
 
@@ -41,35 +41,36 @@ const routes = [
     },
   },
   {
+    path: '/support',
+    name: 'support',
+    component: SupportPage,
+    meta: <RouteMeta>{
+      group: RouteGroup.HOME,
+      label: 'Information Systems',
+      isSidebarMenu: true,
+      authType: AuthType.AUTHENTICATED,
+      roles: [AuthRole.STANDARD_USER, AuthRole.ADMIN, AuthRole.SYSTEM_SUPPORT, AuthRole.SUPER_USER],
+    },
+  },
+  {
     path: '/announcements',
     name: 'announcements',
     component: AnnouncementsPage,
     meta: <RouteMeta>{
-      group: RouteGroup.HOME,
+      group: RouteGroup.MANAGE,
       label: 'User',
       isSidebarMenu: true,
       authType: AuthType.AUTHENTICATED,
       roles: [AuthRole.STANDARD_USER, AuthRole.ADMIN, AuthRole.SYSTEM_SUPPORT, AuthRole.SUPER_USER],
     },
   },
-  {
-    path: '/support',
-    name: 'support',
-    component: SupportPage,
-    meta: <RouteMeta>{
-      group: RouteGroup.MISC,
-      label: 'Support',
-      isSidebarMenu: true,
-      authType: AuthType.AUTHENTICATED,
-      roles: [AuthRole.STANDARD_USER, AuthRole.ADMIN, AuthRole.SYSTEM_SUPPORT, AuthRole.SUPER_USER],
-    },
-  },
+  
   {
     path: '/about-us',
     name: 'about-us',
     component: AboutUsPage,
     meta: <RouteMeta>{
-      group: RouteGroup.MISC,
+      group: RouteGroup.OTHER,
       label: 'About Us',
       isSidebarMenu: true,
       authType: AuthType.AUTHENTICATED,
@@ -179,7 +180,7 @@ const routes = [
         meta: <RouteMeta>{
           label: 'User Management',
           isSidebarMenu: true,
-          group: RouteGroup.ADMIN_TOOLS,
+          group: RouteGroup.MANAGE,
           authType: AuthType.AUTHENTICATED,
           roles: [AuthRole.ADMIN, AuthRole.SUPER_USER],
         },
@@ -191,7 +192,7 @@ const routes = [
         meta: <RouteMeta>{
           label: 'Settings',
           isSidebarMenu: true,
-          group: RouteGroup.ADMIN_TOOLS,
+          group: RouteGroup.MANAGE,
           authType: AuthType.AUTHENTICATED,
           roles: [AuthRole.ADMIN, AuthRole.SUPER_USER],
         },

@@ -38,9 +38,6 @@ const payload = reactive<LoginPayload>({
 /** Form Validation */
 const formRules = {
   $lazy: true,
-  email: {
-    required: helpers.withMessage('Enter your email or mobile number', required),
-  },
   password: {
     required: helpers.withMessage('Enter your password', required),
   },
@@ -171,34 +168,34 @@ const handleLogin = async () => {
     </div>
     <!-- Start Form -->
     <div class="flex justify-center">
-      <form class="mt-6 flex flex-col space-y-2" @submit.prevent>
+      <form class="w-3/4 md:w-3/5 lg:w-3/5  mt-6 flex flex-col space-y-2" @submit.prevent>
         <template v-if="HideEmailInput">
           <WbInputText
             v-model="payload.email"
             label="Email or mobile number"
             :invalid="validator.email.$invalid"
-            :invalid-text="validator.email.$errors[0]?.$message"
-            label-class="text-xs text-surface-0 lg:text-surface-800 dark:lg:text-surface-200"
-            validation-error-message-class="text-xs text-error-300 font-bold lg:font-normal lg:text-error-500 dark:lg:text-error-300"
+          :invalid-text="validator.email.$errors[0]?.$message"
+          label-class="text-xs text-surface-500 lg:text-surface-500"
+          validation-error-message-class="text-xs text-error-300 font-bold lg:font-normal lg:text-error-500 dark:lg:text-error-300"
           ></WbInputText>
         </template>
         <WbPassword
           v-model="payload.password"
-          label="Password"
+          label="Enter your password"
           :feedback="false"
           toggleMask
           :invalid="validator.password.$invalid"
           :invalid-text="validator.password.$errors[0]?.$message"
-          @keyup.enter="handleLogin"
-          label-class="text-xs text-surface-0 lg:text-surface-800 dark:lg:text-surface-200"
+          @keyup.enter="handleLogin" 
+          label-class="text-xs text-surface-500 lg:text-surface-500"
           validation-error-message-class="text-xs text-error-300 font-bold lg:font-normal lg:text-error-500 dark:lg:text-error-300"
         >
         </WbPassword>
-        <div class="mt-4 flex items-center justify-end">
+        <div class="mt-4 flex items-center justify-between pt-6">
           <Button
             label="Forgot Password"
             size="small"
-            class="text-xs text-surface-0 hover:bg-surface-100 dark:text-primary-100 dark:hover:bg-primary-300/20 lg:text-surface-500 dark:lg:text-primary-400"
+            class="text-xs text-surface-500 lg:text-surface-500"
             text
             @click="$router.push({ name: 'forgot-password' })"
           >
@@ -208,7 +205,11 @@ const handleLogin = async () => {
           </Button>
           <!-- Start Action Buttons -->
           <div class="mt-4 flex items-center justify-end">
-            <Button @click="handleLogin" label="Next" size="large" class="bg-blue-800" :loading="formIsSubmitting"> </Button>
+            <Button 
+              @click="handleLogin" 
+              label="Next" size="large" 
+              class="bg-blue-700" 
+              :loading="formIsSubmitting"> </Button>
           </div>
           <!-- End Action Buttons -->
         </div>
@@ -217,5 +218,3 @@ const handleLogin = async () => {
     <!-- End Form -->
   </section>
 </template>
-
-<style scoped></style>

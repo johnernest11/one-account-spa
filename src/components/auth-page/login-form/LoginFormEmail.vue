@@ -65,23 +65,36 @@ const handleNextSection = async () => {
   <section class="bg-transparent">
     <!-- Start Form -->
     <div class="flex justify-center">
-      <form class="mt-6 flex flex-col space-y-2">
+      <form class="w-3/4 md:w-3/5 lg:w-3/5  mt-6 flex flex-col space-y-2">
         <WbInputText
           v-model="payload.email"
-          placeholder="you@example.com"
-          label="Username or Email *"
+          placeholder="Email"
+          label="Username or Email"
           :invalid="validator.email.$invalid"
           :invalid-text="validator.email.$errors[0]?.$message"
-          label-class="text-xs text-surface-0 lg:text-surface-800 dark:lg:text-surface-200"
+          label-class="text-xs text-surface-500 lg:text-surface-500"
           validation-error-message-class="text-xs text-error-300 font-bold lg:font-normal lg:text-error-500 dark:lg:text-error-300"
         >
-          <template #prepend-icon>
-            <i class="pi pi-envelope" />
-          </template>
         </WbInputText>
+      
         <!-- Start Action Buttons -->
-        <div class="mt-4 flex items-center justify-end">
-          <Button @click="handleNextSection" label="Next" size="large" class="bg-blue-800"> </Button>
+        <div class="mt-4 flex items-center justify-between pt-6">
+          <Button
+            label="Forgot Email?"
+            size="small"
+             class="text-xs text-surface-500 lg:text-surface-500"
+            text
+            @click="$router.push({ name: 'forgot-password' })"
+          >
+          </Button>
+
+          <Button 
+            @click="handleNextSection" 
+            label="Next" 
+            size="large" 
+            class="bg-blue-700"> 
+          </Button>
+
         </div>
         <!-- End Action Buttons -->
       </form>
@@ -89,4 +102,3 @@ const handleNextSection = async () => {
     <!-- End Form -->
   </section>
 </template>
-<style scoped></style>

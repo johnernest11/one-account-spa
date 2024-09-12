@@ -59,7 +59,10 @@ const handleLogout = async () => {
 <template>
   <Toolbar class="bg-surface-000 min-h-[4rem] px-6 py-6 shadow-none !ring-0 dark:bg-surface-950">
     <template #start>
-      <AppLogo v-if="uiStore.sidebarMinimized" icon-only class="mr-4"></AppLogo>
+      <div  v-if="uiStore.sidebarMinimized" icon-only class="mr-4">
+          <img src="@/assets/image/DSWDUNO.png" width="150" class="ml-4" />
+      </div>
+      <!-- <AppLogo v-if="uiStore.sidebarMinimized" icon-only class="mr-4"></AppLogo> -->
       <Button
         icon="pi pi-th-large"
         severity="secondary"

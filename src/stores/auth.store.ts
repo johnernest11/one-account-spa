@@ -186,10 +186,6 @@ export const useAuthStore = defineStore('auth', () => {
     loginInfo.value.email = model
   }
 
-  // const saveLoginPasswordSection = (model: LoginPasswordPayload) => {
-  //   loginInfo.value.login_password = model
-  // }
-
   const login = async (payload: LoginPayload) => {
     payload.with_user = true
     payload.client_name = 'Web Browser'
@@ -374,7 +370,6 @@ export const useAuthStore = defineStore('auth', () => {
     authFullAddress,
     loginInfo,
     saveLoginEmailSection,
-    // saveLoginPasswordSection,
     login,
     register,
     logout,
