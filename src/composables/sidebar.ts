@@ -38,13 +38,13 @@ export const useSidebarNavLinks = () => {
 
         switch (route.name) {
           case 'dashboard':
-            navLink.icon = 'pi pi-desktop'
+            navLink.icon = 'pi pi-home'
             break
           case 'profile':
             navLink.icon = 'pi pi-id-card'
             break
           case 'announcements':
-            navLink.icon = 'pi pi-megaphone'
+            navLink.icon = 'pi pi-user'
             break
           case 'user-management':
             navLink.icon = 'pi pi-users'

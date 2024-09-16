@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 /** Typings */
+
 export type RegistrationCredentialsPayload = {
   email: string | null
   mobile_number: string | null

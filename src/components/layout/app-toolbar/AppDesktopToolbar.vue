@@ -2,7 +2,7 @@
 import Toolbar from 'primevue/toolbar'
 import Avatar from 'primevue/avatar'
 import Button from 'primevue/button'
-import WbBreadcrumbs from '@/components/layout/AppBreadcrumbs.vue'
+// import WbBreadcrumbs from '@/components/layout/AppBreadcrumbs.vue'
 import Badge from 'primevue/badge'
 import Menu from 'primevue/menu'
 import Tag from 'primevue/tag'
@@ -13,7 +13,7 @@ import { useAuthStore } from '@/stores/auth.store.ts'
 import { useRouter } from 'vue-router'
 import { computed, ref } from 'vue'
 import { snakeCaseToTitleCase } from '@/utils/helpers.ts'
-import InputText from 'primevue/inputtext'
+// import InputText from 'primevue/inputtext'
 
 const uiStore = useGlobalUiStore()
 const authStore = useAuthStore()
@@ -57,9 +57,12 @@ const handleLogout = async () => {
 </script>
 
 <template>
-  <Toolbar class="min-h-[4rem] bg-surface-200 px-6 py-6 shadow-none !ring-0 dark:bg-surface-950">
+  <Toolbar class="bg-surface-000 min-h-[4rem] px-6 py-6 shadow-none !ring-0 dark:bg-surface-950">
     <template #start>
-      <AppLogo v-if="uiStore.sidebarMinimized" icon-only class="mr-4"></AppLogo>
+      <div  v-if="uiStore.sidebarMinimized" icon-only class="mr-4">
+          <img src="@/assets/image/DSWDUNO.png" width="150" class="ml-4" />
+      </div>
+      <!-- <AppLogo v-if="uiStore.sidebarMinimized" icon-only class="mr-4"></AppLogo> -->
       <Button
         icon="pi pi-th-large"
         severity="secondary"
@@ -70,14 +73,14 @@ const handleLogout = async () => {
         class="mr-4 hover:text-primary-500 dark:!text-surface-200"
         @click="uiStore.toggleSidebar()"
       />
-      <WbBreadcrumbs />
+      <!-- <WbBreadcrumbs /> -->
     </template>
 
     <template #end>
-      <span class="relative mr-4">
+      <!-- <span class="relative mr-4">
         <i class="pi pi-search absolute left-3 top-2/4 -mt-2 text-surface-400 dark:text-surface-600" />
         <InputText placeholder="Search" class="pl-10" />
-      </span>
+      </span> -->
 
       <!-- Start Avatar Menu -->
       <template v-if="authStore.isAuthenticated">
