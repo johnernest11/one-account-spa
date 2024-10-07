@@ -11,7 +11,7 @@ import { useToast } from 'primevue/usetoast'
 /** Payload */
 const formStore = useAuthStore()
 const payload = reactive<LoginEmailPayload>({
-  email: formStore.loginInfo.email?.email || null,
+  email: formStore.loginInfo.email || null,
 })
 
 /** Events */
