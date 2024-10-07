@@ -17,10 +17,11 @@ const props = defineProps({
 /** Payload */
 const formStore = useAuthStore()
 const payloads = reactive<LoginEmailPayload>({
-  email: formStore.loginInfo.email?.email || null,
+  email: formStore.loginInfo.email || null,
 })
 
-const MaskEmail = maskEmail(payloads.email); // Outputs: "joh******@example.com"
+const email = payloads.email;
+const MaskEmail = maskEmail(email as string); 
 
 
 /** Handle MFA code verification **/

@@ -8,7 +8,6 @@ import Menu from 'primevue/menu'
 import Tag from 'primevue/tag'
 import type { MenuItem } from 'primevue/menuitem'
 import { useGlobalUiStore } from '@/stores/ui.store.ts'
-import AppLogo from '@/components/layout/AppLogo.vue'
 import { useAuthStore } from '@/stores/auth.store.ts'
 import { useRouter } from 'vue-router'
 import { computed, ref } from 'vue'
@@ -62,7 +61,6 @@ const handleLogout = async () => {
       <div  v-if="uiStore.sidebarMinimized" icon-only class="mr-4">
           <img src="@/assets/image/DSWDUNO.png" width="150" class="ml-4" />
       </div>
-      <!-- <AppLogo v-if="uiStore.sidebarMinimized" icon-only class="mr-4"></AppLogo> -->
       <Button
         icon="pi pi-th-large"
         severity="secondary"
