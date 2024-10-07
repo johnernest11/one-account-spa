@@ -24,12 +24,13 @@ const props = withDefaults(defineProps<{ showLoginExpiredAlert: boolean }>(), {
 })
 
 const route = useRoute()
-const HideEmailInput = ref(false) // Initially visible
+const HideEmailInput = ref(false) 
 /** Payload */
 const formStore = useAuthStore()
 const payloads = reactive<LoginEmailPayload>({
-  email: formStore.loginInfo.email?.email || null,
+  email: formStore.loginInfo.email || null,
 })
+
 const payload = reactive<LoginPayload>({
   email: payloads.email || '',
   password: '',
@@ -155,7 +156,7 @@ const handleLogin = async () => {
   <section class="bg-transparent">
     <div class="text-center text-surface-0 lg:text-surface-800">
       <p class="mb-2 mt-2 text-sm text-blue-900">
-        Welcome, <strong>{{ payloads.email }} </strong><br />
+        Welcome, <strong>{{ payload.email }} </strong><br />
         Not you?.
       </p>
       <!-- Start Auth Token Expired Message -->
@@ -179,6 +180,7 @@ const handleLogin = async () => {
           validation-error-message-class="text-xs text-error-300 font-bold lg:font-normal lg:text-error-500 dark:lg:text-error-300"
           ></WbInputText>
         </template>
+        
         <WbPassword
           v-model="payload.password"
           label="Enter your password"

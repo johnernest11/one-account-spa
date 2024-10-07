@@ -12,7 +12,7 @@ export type LoginEmailPayload = {
 }
 
 export type LoginPayload = {
-  email: LoginEmailPayload | null
+  email: string | null
   password: string | null
   with_user?: boolean
   client_name?: string
@@ -183,7 +183,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   /** Actions */
   const saveLoginEmailSection = (model: LoginEmailPayload) => {
-    loginInfo.value.email = model
+    loginInfo.value.email = model.email
   }
 
   const login = async (payload: LoginPayload) => {
