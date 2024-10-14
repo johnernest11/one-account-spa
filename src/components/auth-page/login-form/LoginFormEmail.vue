@@ -103,7 +103,7 @@ const handleNextSection = async () => {
             label="Next" 
             size="large" 
              :loading="formIsSubmitting"
-            class="bg-blue-900"> 
+            class="bg-blue-800"> 
           </Button>
 
         </div>

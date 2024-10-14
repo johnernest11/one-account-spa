@@ -206,7 +206,7 @@ const handleLogin = async () => {
             <Button 
               @click="handleLogin" 
               label="Next" size="large" 
-              class="bg-blue-900" 
+              class="bg-blue-800" 
               :loading="formIsSubmitting"> </Button>
           </div>
           <!-- End Action Buttons -->
