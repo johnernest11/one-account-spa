@@ -102,7 +102,7 @@ const handleNextSection = async () => {
             @click="handleNextSection" 
             label="Next" 
             size="large" 
-             :loading="formIsSubmitting"
+            :loading="formIsSubmitting"
             class="bg-blue-800"> 
           </Button>
 
