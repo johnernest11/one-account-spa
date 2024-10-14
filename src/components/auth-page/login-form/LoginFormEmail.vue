@@ -78,7 +78,7 @@ const handleNextSection = async () => {
           placeholder="Enter your email"
           label="Username or Email"
           size="small"
-          class="text-xs text-surface-800 lg:text-surface-100 font-sans"
+          class="text-xs text-surface-800 lg:text-surface-800 font-sans"
           @keyup.enter="handleNextSection" 
           :invalid="validator.email.$invalid"
           :invalid-text="validator.email.$errors[0]?.$message"
@@ -92,7 +92,7 @@ const handleNextSection = async () => {
           <Button
             label="Forgot Email?"
             size="small"
-             class="text-xs text-surface-600 lg:text-surface-100 font-sans"
+            class="text-xs text-surface-600 lg:text-surface-800 font-sans"
             text
             @click="$router.push({ name: 'forgot-password' })"
           >

@@ -196,7 +196,7 @@ const handleLogin = async () => {
           <Button
             label="Forgot Password ?"
             size="small"
-              class="text-xs text-surface-600 lg:text-surface-100 font-sans"
+              class="text-xs text-surface-600 lg:text-surface-800 font-sans"
             text
             @click="$router.push({ name: 'forgot-password' })"
           >
