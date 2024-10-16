@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import WbInputText from '@/components/webkit/WbInputText.vue'
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import useVuelidate from '@vuelidate/core'
 import { helpers, required, email } from '@vuelidate/validators'
 import { uniqueUserIdentifierRule } from '@/utils/custom-validations.ts'
@@ -35,9 +35,14 @@ const formRules = {
   },
 }
 
-/** Handle Next Section */
+
 const validator = useVuelidate<LoginEmailPayload>(formRules, payload)
+/** Form Submission State */
+const formIsSubmitting = ref(false);
+
+/** Handle Next Section (with Loading State) */
 const handleNextSection = async () => {
+  formIsSubmitting.value = true; // Set button to loading state
   const valid = await validator.value.$validate()
 
   if (!valid) {
@@ -47,11 +52,13 @@ const handleNextSection = async () => {
       detail: 'We could not find the account associated with the username/email you have provided',
       life: 5000,
     })
-    return // Prevent further processing if validation fails
+    formIsSubmitting.value = false; // Reset button state after error
+    return; // Prevent further processing if validation failss
   }
 
   formStore.saveLoginEmailSection(payload)
   emits('nextButtonClicked') // Emit event for successful validation
+  formIsSubmitting.value = false; // Reset button state after success
 }
 </script>
 
@@ -68,8 +75,11 @@ const handleNextSection = async () => {
       <form class="w-3/4 md:w-3/5 lg:w-3/5  mt-6 flex flex-col space-y-2">
         <WbInputText
           v-model="payload.email"
-          placeholder="Email"
+          placeholder="Enter your email"
           label="Username or Email"
+          size="small"
+          class="text-xs text-surface-800 lg:text-surface-800 font-sans"
+          @keyup.enter="handleNextSection" 
           :invalid="validator.email.$invalid"
           :invalid-text="validator.email.$errors[0]?.$message"
           label-class="text-xs text-surface-500 lg:text-surface-500"
@@ -82,7 +92,7 @@ const handleNextSection = async () => {
           <Button
             label="Forgot Email?"
             size="small"
-             class="text-xs text-surface-500 lg:text-surface-500"
+            class="text-xs text-surface-600 lg:text-surface-800 font-sans"
             text
             @click="$router.push({ name: 'forgot-password' })"
           >
@@ -92,7 +102,8 @@ const handleNextSection = async () => {
             @click="handleNextSection" 
             label="Next" 
             size="large" 
-            class="bg-blue-700"> 
+            :loading="formIsSubmitting"
+            class="bg-blue-800"> 
           </Button>
 
         </div>
