@@ -64,7 +64,7 @@ const handleNextSection = async () => {
 
 <template>
   <div class="text-center text-surface-0 lg:text-surface-800">
-    <p class="mb-2 mt-2 text-sm text-blue-900">
+    <p class="mb-2 mt-2 text-sm text-primary-900">
       Welcome, please use your active directory <br />
       account username to continue.
     </p>
@@ -103,7 +103,7 @@ const handleNextSection = async () => {
             label="Next" 
             size="large" 
             :loading="formIsSubmitting"
-            class="bg-blue-800"> 
+            class="bg-primary-900" > 
           </Button>
 
         </div>

@@ -49,7 +49,7 @@ const handlePreviousButtonClicked = () => {
   <img src="@/assets/image/DesignBelow.png" class="absolute bottom-0 w-full mx-auto" />
   <div class="text-surface text-center lg:text-surface-800">
     <img src="@/assets/image/DSWDUNO.png" width="100" class="mx-auto  my-1"  />
-    <div class="text-center text-blue-900">
+    <div class="text-center text-primary-900">
       <h5>Sign In to continue to <strong>Records</strong></h5>
       <h3><b>Management and</b></h3>
       <h1><strong>Disposition Information System</strong></h1>
