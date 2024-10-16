@@ -156,7 +156,7 @@ const handleLogin = async () => {
     <div class="text-center text-surface-0 lg:text-surface-800">
       <p class="mb-2 mt-2 text-sm text-blue-900">
         Welcome, <strong>{{ payload.email }} </strong><br />
-        <p class="mb-2 mt-2 text-sm text-gray-600"><strong>Not you ?</strong></p>
+        <p class="mb-2 mt-2 text-sm text-gray-600 font-bold">Not you ?</p>
       </p>
       <!-- Start Auth Token Expired Message -->
       <transition enter-active-class="transition duration-200" enter-from-class="scale-50 opacity-0" leave-to-class="opacity-0">
