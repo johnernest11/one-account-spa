@@ -8,7 +8,6 @@ import useVuelidate from '@vuelidate/core'
 import { helpers, required } from '@vuelidate/validators'
 import { useRoute, useRouter } from 'vue-router'
 import { LoginPayload, LoginEmailPayload, useAuthStore } from '@/stores/auth.store.ts'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { ApiErrorCode } from '@/typings/http-resources.types.ts'
 import { useSettingsStore } from '@/stores/settings.store.ts'
 import { useToast } from 'primevue/usetoast'
@@ -154,10 +153,10 @@ const handleLogin = async () => {
 
 <template>
   <section class="bg-transparent">
-    <div class="text-center text-surface-0 lg:text-surface-800">
-      <p class="mb-2 mt-2 text-sm text-blue-900">
+    <div class="text-center text-surface-0 lg:text-primary-800">
+      <p class="mb-2 mt-2 text-sm text-primary-900">
         Welcome, <strong>{{ payload.email }} </strong><br />
-        Not you?.
+        <p class="mb-2 mt-2 text-surface-600 font-semibold">Not you ?</p>
       </p>
       <!-- Start Auth Token Expired Message -->
       <transition enter-active-class="transition duration-200" enter-from-class="scale-50 opacity-0" leave-to-class="opacity-0">
@@ -195,22 +194,19 @@ const handleLogin = async () => {
         </WbPassword>
         <div class="mt-4 flex items-center justify-between pt-6">
           <Button
-            label="Forgot Password"
+            label="Forgot Password ?"
             size="small"
-            class="text-xs text-surface-500 lg:text-surface-500"
+              class="text-xs text-surface-600 lg:text-surface-800 font-sans"
             text
             @click="$router.push({ name: 'forgot-password' })"
           >
-            <template #icon>
-              <FontAwesomeIcon icon="fa-solid fa-lock" class="mr-1.5" />
-            </template>
           </Button>
           <!-- Start Action Buttons -->
-          <div class="mt-4 flex items-center justify-end">
+          <div class="mt-1 flex items-center justify-end">
             <Button 
               @click="handleLogin" 
               label="Next" size="large" 
-              class="bg-blue-700" 
+              class="bg-primary-900" 
               :loading="formIsSubmitting"> </Button>
           </div>
           <!-- End Action Buttons -->
