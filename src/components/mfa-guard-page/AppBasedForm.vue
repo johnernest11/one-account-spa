@@ -135,21 +135,22 @@ const handleShowOtpInput = () => {
 </script>
 
 <template>
-  <div class="text-center text-surface-0 lg:text-surface-800 ">
+  <section>
+  <div class=" text-surface-0 lg:text-surface-800 ">
     <!-- Start Form Title -->
     <div class="flex w-full flex-col text-surface-600 lg:pt-24 sm:pt-0">
         <img src="@/assets/image/DSWDUNO.png" width="150" class="mx-auto" />
       </div>
-      <h5 class="text-md mb-0 mt-0 text-primary-900">
+      <h5 class="text-md mb-0 mt-0 text-primary-900 text-center">
         <b>Multi-Factor Authentication</b>
       </h5>
-      <h3 class="text-md mb-0 mt-0 text-primary-900">
+      <h3 class="text-md mb-0 mt-0 text-primary-900 text-center">
         <span>{{ props.stepsStatus }}</span>
         <b> {{ props.mfaName }} </b>
       </h3>
     <!-- End Form Title -->
     <!-- Start Form Caption -->
-    <div class="flex w-full flex-col text-surface-600">
+    <div class="flex w-full flex-col text-surface-600 text-center">
       <p class="my-2 text-sm leading-relaxed dark:text-surface-100">
         <span v-if="showOtpInput">
           Enter the six-digit code shown in your <span class="font-bold text-primary-900">Authenticator </span> app to
@@ -157,7 +158,7 @@ const handleShowOtpInput = () => {
         </span>
         <span v-if="showQrCode">
           <span class="font-bold">Scan</span> the QR code with the
-          <span class="font-bold text-primary-500">{{ props.mfaName }}</span> app. Note that the QR code will only be displayed
+          <span class="font-bold text-primary-500">Authenticator App. </span>Note that the QR code will only be displayed
           <b>once</b>.
         </span>
         <span v-if="showBackupCodes">
@@ -174,7 +175,7 @@ const handleShowOtpInput = () => {
       </p>
     </div>
     <!-- End Form Caption -->
-    <div class="mt-4 flex justify-center">
+    <div class="mt-2 flex justify-center">
       <!-- Start show the QR code first if the user has not enrolled yet -->
       <div v-if="showQrCode" class="flex w-full flex-col items-center justify-center text-sm">
         <Image :src="qrCodeBase64 || undefined" alt="MFA QR Code" width="250"></Image>
@@ -191,18 +192,24 @@ const handleShowOtpInput = () => {
         <div
           v-for="code in backupCodes"
           :key="code"
-          class="text-md mb-1 rounded-lg bg-surface-200 px-3 py-1 font-code dark:bg-surface-800 sm:text-xl"
+          class="text-md mb-1 rounded-lg bg-surface-200 px-3 py-1 font-code dark:bg-surface-800 sm:text-xl text-surface-900"
         >
           {{ code }}
         </div>
       </div>
       <!-- End Display Backup Codes -->
       <!-- Start Backup Codes Input -->
-      <WbInputText v-if="showBackupCodesInput" v-model="backupCode" label="Backup Code" class="mb-2 !font-code !text-lg" />
+      <WbInputText
+        v-if="showBackupCodesInput"
+        v-model="backupCode"
+        label="Backup Code"
+        label-class="text-xs text-surface-500 lg:text-surface-900 "
+        class="text-xs text-surface-800 lg:text-surface-800 font-sans"
+      />
       <!-- End Backup Codes Input -->
     </div>
     <!-- Start Action Buttons -->
-    <div class="mt-6 flex flex-col items-start justify-between gap-y-4 md:flex-row lg:mt-8">
+    <div class="mt-6 flex flex-col items-start justify-between gap-y-4 sm:flex-row md:flex-row lg:mt-8 pb-12">
       <div class="mt-4 flex w-full flex-col sm:items-start md:mt-0">
         <Button
           v-if="showOtpInput"
@@ -233,12 +240,13 @@ const handleShowOtpInput = () => {
           <FontAwesomeIcon icon="fa-solid fa-key" class="mr-2" />
         </template>
       </Button>
-      <Button v-if="showQrCode" @click="handleQrCodeContinue" label="Continue" class="w-full justify-self-end px-8 sm:w-auto">
+      <Button v-if="showQrCode" @click="handleQrCodeContinue" label="Continue" class="py-2 px-4 text-sm font-medium text-white bg-primary-900 rounded-lg w-full sm:w-auto justify-self-end mx-2">
         <template #icon>
           <FontAwesomeIcon icon="fa-solid fa-arrow-circle-right" class="mr-2" />
         </template>
       </Button>
-      <Button v-if="showBackupCodes" @click="handleShowOtpInput" label="Complete" class="w-full justify-self-end px-8 sm:w-auto">
+      <Button v-if="showBackupCodes" @click="handleShowOtpInput" label="Complete" class="py-2 px-4 text-sm font-medium text-white bg-primary-900 rounded-lg w-full sm:w-auto justify-self-end mx-2">
+        
         <template #icon>
           <FontAwesomeIcon icon="fa-solid fa-circle-check" class="mr-2" />
         </template>
@@ -249,7 +257,7 @@ const handleShowOtpInput = () => {
         :disabled="!backupCode || backupCodeIsBeingVerified"
         :loading="backupCodeIsBeingVerified"
         label="Verify Backup Code"
-        class="w-full justify-self-end sm:w-60 bg-primary-900"
+        class="w-full justify-self-end sm:w-60 bg-primary-900 truncate"
       >
         <template #icon>
           <FontAwesomeIcon icon="fa-solid fa-key" class="mr-2" />
@@ -258,4 +266,5 @@ const handleShowOtpInput = () => {
     </div>
     <!-- End Action Buttons -->
   </div>
+</section>
 </template>
