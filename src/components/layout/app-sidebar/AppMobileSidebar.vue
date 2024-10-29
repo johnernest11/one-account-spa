@@ -70,7 +70,7 @@ const handleLogout = async () => {
                 $route.name === link.name ? 'w-12 bg-primary-800 text-primary-900 dark:!bg-primary-400/70 dark:!text-surface-200' : ''
               }`"
               >
-              <i class="text-md ml-2" :class="[link.icon, $route.name ===link.name ? 'text-white' : 'text-black']"></i>
+              <i class="text-md ml-2" :class="[link.icon, $route.name ===link.name ? 'text-surface-0' : 'text-surface-700']"></i>
               <span class=" text-md ml-10 font-small " style="font-weight: bold;">{{ link.label }}</span>
               </RouterLink>
             </div>

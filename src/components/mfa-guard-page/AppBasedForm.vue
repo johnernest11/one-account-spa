@@ -234,7 +234,7 @@ const handleShowOtpInput = () => {
         :disabled="!mfaCode"
         @click="handleCodeVerification(mfaCode)"
         label="Verify Code"
-        class="w-full bg-primary-900 text-white sm:w-40"
+        class="w-full bg-primary-900 text-surface-0 sm:w-40"
       >
         <template #icon>
           <FontAwesomeIcon icon="fa-solid fa-key" class="mr-2" />
