@@ -146,7 +146,7 @@ const handleShowOtpInput = () => {
       </h5>
       <h3 class="text-md mb-0 mt-0 text-primary-900 text-center">
         <span>{{ props.stepsStatus }}</span>
-        <b> {{ props.mfaName }} </b>
+        <b> Authenticator App </b>
       </h3>
     <!-- End Form Title -->
     <!-- Start Form Caption -->
@@ -210,7 +210,6 @@ const handleShowOtpInput = () => {
     </div>
     <!-- Start Action Buttons -->
     <div class="mt-6 flex flex-col items-start justify-between gap-y-4 sm:flex-row md:flex-row lg:mt-8 pb-12">
-      <div class="mt-4 flex w-full flex-col sm:items-start md:mt-0">
         <Button
           v-if="showOtpInput"
           @click="handleShowBackupCodeInput"
@@ -222,12 +221,11 @@ const handleShowOtpInput = () => {
             <FontAwesomeIcon icon="fa-solid fa-database" class="mr-2" />
           </template>
         </Button>
-        <Button v-if="showBackupCodesInput" @click="handleShowOtpInput" severity="secondary" label="Back">
+        <Button v-if="showBackupCodesInput" @click="handleShowOtpInput" severity="secondary"  class="w-full sm:w-fit" label="Back">
           <template #icon>
             <FontAwesomeIcon icon="fa-solid fa-arrow-circle-left" class="mr-2" />
           </template>
         </Button>
-      </div>
       <Button
         v-if="showOtpInput"
         :loading="mfaCodeIsBeingVerified"
@@ -257,7 +255,7 @@ const handleShowOtpInput = () => {
         :disabled="!backupCode || backupCodeIsBeingVerified"
         :loading="backupCodeIsBeingVerified"
         label="Verify Backup Code"
-        class="w-full justify-self-end sm:w-60 bg-primary-900 truncate"
+       class="w-full sm:w-fit  bg-primary-900 text-surface-0 "
       >
         <template #icon>
           <FontAwesomeIcon icon="fa-solid fa-key" class="mr-2" />
