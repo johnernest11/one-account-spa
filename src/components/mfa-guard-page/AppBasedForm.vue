@@ -153,8 +153,10 @@ const handleShowOtpInput = () => {
     <div class="flex w-full flex-col text-surface-600 text-center">
       <p class="my-2 text-sm leading-relaxed dark:text-surface-100">
         <span v-if="showOtpInput">
-          Enter the six-digit code shown in your <span class="font-bold text-primary-900">Authenticator </span> app to
-          proceed.
+          Enter the six-digit code shown in your 
+          <span class="font-bold text-primary-900">Authenticator </span> app to 
+          <br> 
+           proceed.
         </span>
         <span v-if="showQrCode">
           <span class="font-bold">Scan</span> the QR code with the
@@ -215,7 +217,7 @@ const handleShowOtpInput = () => {
           @click="handleShowBackupCodeInput"
           severity="secondary"
           label="Use Backup Code"
-          class="w-full sm:w-fit"
+         class="w-full sm:w-fit"
         >
           <template #icon>
             <FontAwesomeIcon icon="fa-solid fa-database" class="mr-2" />
@@ -232,7 +234,7 @@ const handleShowOtpInput = () => {
         :disabled="!mfaCode"
         @click="handleCodeVerification(mfaCode)"
         label="Verify Code"
-        class="w-full bg-primary-900 text-surface-0 sm:w-40"
+        class="w-full sm:w-fit  bg-primary-900 text-surface-0 "
       >
         <template #icon>
           <FontAwesomeIcon icon="fa-solid fa-key" class="mr-2" />
