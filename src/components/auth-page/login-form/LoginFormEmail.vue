@@ -72,7 +72,7 @@ const handleNextSection = async () => {
   <section class="bg-transparent">
     <!-- Start Form -->
     <div class="flex justify-center">
-      <form class="w-3/4 md:w-3/5 lg:w-3/5  mt-6 flex flex-col space-y-2">
+      <form class="w-3/4 md:w-3/5 lg:w-3/5  mt-6 flex flex-col space-y-2"  @submit.prevent>
         <WbInputText
           v-model="payload.email"
           placeholder="Enter your email"
@@ -88,7 +88,7 @@ const handleNextSection = async () => {
         </WbInputText>
       
         <!-- Start Action Buttons -->
-        <div class="mt-4 flex items-center justify-between pt-6">
+        <div class="mt-4 flex items-center justify-between pt-6 pb-12">
           <Button
             label="Forgot Email?"
             size="small"
@@ -98,14 +98,14 @@ const handleNextSection = async () => {
           >
           </Button>
 
-          <Button 
-            @click="handleNextSection" 
-            label="Next" 
-            size="large" 
+          <Button
+            @click="handleNextSection"
+            label="Next"
+            size="large"
             :loading="formIsSubmitting"
-            class="bg-primary-900" > 
+            class="bg-primary-900"
+          >
           </Button>
-
         </div>
         <!-- End Action Buttons -->
       </form>

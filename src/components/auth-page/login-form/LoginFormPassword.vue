@@ -14,7 +14,8 @@ import { useToast } from 'primevue/usetoast'
 
 /** Emits */
 const emit = defineEmits<{
-  (e: 'onCredentialsError', value: boolean): void
+    (e: 'onCredentialsError', value: boolean): void;
+    (e: 'previousButtonClicked'): void;
 }>()
 
 /** Props */
@@ -153,10 +154,20 @@ const handleLogin = async () => {
 
 <template>
   <section class="bg-transparent">
+    <div class="flex justify-center">
+    <form class="w-3/4 md:w-3/5 lg:w-3/5  mt-6 flex flex-col space-y-2" @submit.prevent>
     <div class="text-center text-surface-0 lg:text-primary-800">
-      <p class="mb-2 mt-2 text-sm text-primary-900">
+      <p class="mb-1 mt-2 text-sm text-primary-900">
         Welcome, <strong>{{ payload.email }} </strong><br />
-        <p class="mb-2 mt-2 text-surface-600 font-semibold">Not you ?</p>
+        <p>
+          <Button 
+              @click="emit('previousButtonClicked')"
+              label=" Not you ?"
+              class="mt-1 text-surface-600 font-semibold"
+              text
+            >
+            </Button>
+         </p>
       </p>
       <!-- Start Auth Token Expired Message -->
       <transition enter-active-class="transition duration-200" enter-from-class="scale-50 opacity-0" leave-to-class="opacity-0">
@@ -167,8 +178,6 @@ const handleLogin = async () => {
       <!-- End Auth Token Expired Message -->
     </div>
     <!-- Start Form -->
-    <div class="flex justify-center">
-      <form class="w-3/4 md:w-3/5 lg:w-3/5  mt-6 flex flex-col space-y-2" @submit.prevent>
         <template v-if="HideEmailInput">
           <WbInputText
             v-model="payload.email"
@@ -192,7 +201,7 @@ const handleLogin = async () => {
           validation-error-message-class="text-xs text-error-300 font-bold lg:font-normal lg:text-error-500 dark:lg:text-error-300"
         >
         </WbPassword>
-        <div class="mt-4 flex items-center justify-between pt-6">
+        <div class="mt-4 flex items-center justify-between pt-6 pb-12">
           <Button
             label="Forgot Password ?"
             size="small"
@@ -202,7 +211,7 @@ const handleLogin = async () => {
           >
           </Button>
           <!-- Start Action Buttons -->
-          <div class="mt-1 flex items-center justify-end">
+          <div class="mt-1 flex items-center justify-end ">
             <Button 
               @click="handleLogin" 
               label="Next" size="large" 
