@@ -27,7 +27,7 @@ const handleLogout = async () => {
 
 <template>
   <div class="card flex justify-center">
-    <Sidebar v-model:visible="visible" position="right" class="w-full md:w-[20rem] lg:w-[30rem]" @click="visible = false">
+    <Sidebar v-model:visible="visible" position="left" class="w-full md:w-[20rem] lg:w-[30rem]" @click="visible = false">
       <template #closeicon>
         <FontAwesomeIcon icon="fa fa-xmark" class="h-4 w-4" />
       </template>
@@ -65,14 +65,13 @@ const handleLogout = async () => {
                 v-for="link in item.links"
                 :key="link.label"
                 :to="{ name: link.name }"
-                :class="`flex transform items-center rounded-lg px-3 py-2 transition-colors duration-300 hover:bg-primary-100 hover:text-primary-900 dark:text-surface-200 dark:hover:bg-primary-400/70${
-                  $route.name === link.name
-                    ? 'bg-primary-100 text-primary-900 dark:!bg-primary-400/70 dark:!text-surface-200'
-                    : ''
-                }`"
+                :class="`flex transform items-center rounded-lg px-2 py-2 transition-colors duration-300 hover:bg-primary-100 
+              hover:text-primary-900 dark:text-surface-200 dark:hover:bg-primary-400/70 ${
+                $route.name === link.name ? 'w-12 bg-primary-800 text-primary-900 dark:!bg-primary-400/70 dark:!text-surface-200' : ''
+              }`"
               >
-                <i :class="link.icon"></i>
-                <span class="mx-2 text-sm font-medium">{{ link.label }}</span>
+              <i class="text-md ml-2" :class="[link.icon, $route.name ===link.name ? 'text-surface-0' : 'text-surface-700']"></i>
+              <span class=" text-md ml-10 font-small " style="font-weight: bold;">{{ link.label }}</span>
               </RouterLink>
             </div>
           </nav>

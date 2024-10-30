@@ -114,10 +114,10 @@ const stepStatus = computed(() => {
 
 <template>
     <div class="relative flex min-h-screen">
-    <div class="mx-auto flex flex-col items-center px-0 py-8 md:h-screen lg:py-0 pt-24">
-      <img src="@/assets/image/DesignTop.png" class="mx-auto" style="position: absolute; top: 0; width: 100%" />
-      <img src="@/assets/image/DesignBelow.png" class="mx-auto" style="position: absolute; bottom: 0; width: 100%" />
-      <div class="relative z-10 w-[96%] min-w-[96%] sm:mx-0 sm:w-auto md:min-w-[65%] lg:min-w-[50%]">
+    <div class="mx-auto flex flex-col items-center px-0 py-8 md:min-h-screen lg:py-0 pt-24">
+      <img src="@/assets/image/DesignTop.png" class="absolute top-0 w-full mx-auto" />
+  <img src="@/assets/image/DesignBelow.png" class="absolute bottom-0 w-full mx-auto" />
+  <div class="mt-4 flex justify-center">
         <!-- Start MFA Form -->
         <DeliveryBasedForm
           v-if="authStore.currentMfaStep?.type === 'delivery'"

@@ -96,15 +96,15 @@ const handleResendMfaCode = async () => {
       <div class="flex w-full flex-col text-surface-600 lg:pt-24 sm:pt-0">
         <img src="@/assets/image/DSWDUNO.png" width="150" class="mx-auto" />
       </div>
-      <h5 class="text-md mb-0 mt-0 text-blue-900">
+      <h5 class="text-md mb-0 mt-0 text-primary-900">
         <b>Multi-Factor Authentication</b>
       </h5>
-      <h3 class="text-md mb-0 mt-0 text-blue-900">
+      <h3 class="text-md mb-0 mt-0 text-primary-900">
         <span>{{ props.stepsStatus }}</span>
         <b> {{ props.mfaName }} </b>
       </h3>
       <div class="flex w-full flex-col text-surface-600">
-        <p v-if="props.isFirstMfaStep" class="my-2 text-sm leading-relaxed dark:text-surface-100 text-blue-900">
+        <p v-if="props.isFirstMfaStep" class="my-2 text-sm leading-relaxed dark:text-surface-100 text-primary-900">
           We have sent a six-digit one-time-password <br> (OTP) to your email <strong>{{ MaskEmail }}</strong><br>
           <strong class="text-black">Not you?.</strong>
         </p>
@@ -122,7 +122,7 @@ const handleResendMfaCode = async () => {
               :loading="mfaCodeIsBeingResent"
               @click="handleResendMfaCode"
               :label="`${props.isFirstMfaStep ? 'Re-send OTP' : 'Send OTP'}`"
-              class="text-md lg:text-blue-900 border-0"
+              class="text-md lg:text-primary-900 border-0"
               size="small"
               text
             >
@@ -137,7 +137,7 @@ const handleResendMfaCode = async () => {
             @click="handleCodeVerification(mfaCode)"
             :disabled="!mfaCode"
             label="Verify Code"
-            class="w-full bg-blue-700 text-white sm:w-40"
+            class="w-full bg-primary-900 text-white sm:w-40"
           >
           </Button>
         </div>
