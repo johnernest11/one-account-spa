@@ -136,9 +136,9 @@ const handleShowOtpInput = () => {
 
 <template>
   <section>
-  <div class=" text-surface-0 lg:text-surface-800 ">
+  <div class=" text-surface-0 lg:text-surface-800 px-4 ">
     <!-- Start Form Title -->
-    <div class="flex w-full flex-col text-surface-600 lg:pt-24 sm:pt-0">
+    <div class="flex w-full flex-col text-surface-600 lg:pt-24 sm:pt-0 p-6">
         <img src="@/assets/image/DSWDUNO.png" width="150" class="mx-auto" />
       </div>
       <h5 class="text-md mb-0 mt-0 text-primary-900 text-center">
@@ -150,12 +150,11 @@ const handleShowOtpInput = () => {
       </h3>
     <!-- End Form Title -->
     <!-- Start Form Caption -->
-    <div class="flex w-full flex-col text-surface-600 text-center">
+    <div class="flex w-full flex-col text-surface-600 text-center ">
       <p class="my-2 text-sm leading-relaxed dark:text-surface-100">
         <span v-if="showOtpInput">
           Enter the six-digit code shown in your 
           <span class="font-bold text-primary-900">Authenticator </span> app to 
-          <br> 
            proceed.
         </span>
         <span v-if="showQrCode">
@@ -211,7 +210,7 @@ const handleShowOtpInput = () => {
       <!-- End Backup Codes Input -->
     </div>
     <!-- Start Action Buttons -->
-    <div class="mt-6 flex flex-col items-start justify-between gap-y-4 sm:flex-row md:flex-row lg:mt-8 pb-12">
+    <div class=" whitespace-pre-wrap mt-6 flex flex-col items-start justify-between gap-y-4 sm:flex-row md:flex-row lg:mt-8 pb-12 ">
         <Button
           v-if="showOtpInput"
           @click="handleShowBackupCodeInput"
