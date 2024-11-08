@@ -94,6 +94,17 @@ const routes = [
         },
       },
       {
+        path: 'sso',
+        name: 'sso',
+        component: () => import('@/views/SsoPage.vue'),
+        meta: <RouteMeta>{
+          label: 'sso',
+          hideNavigation: true,
+          authType: AuthType.UNAUTHENTICATED,
+          group: RouteGroup.AUTH,
+        },
+      },
+      {
         path: 'sign-up',
         name: 'sign-up',
         component: () => import('@/views/AuthPage.vue'),

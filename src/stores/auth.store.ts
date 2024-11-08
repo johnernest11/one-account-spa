@@ -5,10 +5,33 @@ import { useApiCall } from '@/composables/network.ts'
 import { ApiResponseBody } from '@/typings/http-resources.types.ts'
 import { UserResponse } from '@/typings/models.types.ts'
 import { RegistrationPayload } from '@/stores/forms.store.ts'
+import axios, {AxiosResponse} from 'axios'
+import exp from 'constants'
 
 /** Typings */
 export type LoginEmailPayload = {
   email: string | null
+}
+
+export type OAuthRequestPayload = {
+  client_id: string
+  redirect_uri: string
+  name?: string | undefined
+  state: string
+  response_type: string
+}
+
+export type ClientResponse = {
+  id: string
+  user_id: number | null
+  name: string
+  provider: string | null
+  redirect: string
+  personal_access_client: boolean
+  password_client: boolean
+  revoked: boolean
+  created_at: string
+  updated_at: string
 }
 
 export type LoginPayload = {
@@ -16,6 +39,15 @@ export type LoginPayload = {
   password: string | null
   with_user?: boolean
   client_name?: string
+}
+
+export type OAuthPayload = {
+  grant_type: string
+  client_id: string
+  client_secret: string
+  username: string
+  password: string
+  scope?: string
 }
 
 export type AuthResponse = {
@@ -103,10 +135,18 @@ export const useAuthStore = defineStore('auth', () => {
     mergeDefaults: true,
   })
 
+  const ssoPayload = useStorage<oAuthRequestPayload>('sso-params', null, localStorage,{
+    serializer: StorageSerializers.object,
+    deep: true,
+    mergeDefaults: true,
+  })
+
   const loginInfo = ref<LoginPayload>({
     email: null,
     password: null,
   })
+
+
 
   /** Computed / Getters */
   const isAuthenticated = computed(() => {
@@ -184,6 +224,44 @@ export const useAuthStore = defineStore('auth', () => {
   /** Actions */
   const saveLoginEmailSection = (model: LoginEmailPayload) => {
     loginInfo.value.email = model.email
+  }
+
+  const oAuthRequest = async (payload: string) => {
+    const oAuthURL = import.meta.env.VITE_OAUTH_ROOT_URL
+    const axiosInstance = axios.create({
+      baseURL: oAuthURL,
+      withCredentials: true,
+    })
+
+    try {
+      const response: AxiosResponse = await axiosInstance.get(`${oAuthURL}/authorize${payload}`)
+      return response.data
+    } catch (error) {
+      return error
+    }
+    
+  }
+
+  const fetchClientId = async (clientId: string) => {
+    const { data } = await useApiCall(`sso/clients/${clientId}`).get().json()
+    const responseData: ApiResponseBody = data.value
+
+    if (responseData.success) {
+      const response = responseData.data as ClientResponse
+      console.log(response)
+
+      ssoPayload.value.name = response?.name
+    }
+
+    return responseData
+  }
+
+  const saveSSOPayload = (payload: OAuthRequestPayload) => {
+    ssoPayload.value = payload
+  }
+
+  const oAuth =  (payload: OAuthPayload) =>{ 
+    console.log(123)
   }
 
   const login = async (payload: LoginPayload) => {
@@ -387,5 +465,9 @@ export const useAuthStore = defineStore('auth', () => {
     verifyMfaBackupCode,
     fetchAllAvailableMfaMethods,
     unEnrollUserFromMfaMethod,
+    oAuthRequest,
+    ssoPayload,
+    saveSSOPayload,
+    fetchClientId
   }
 })

@@ -5,12 +5,15 @@ import { computed, onMounted, ref, watch } from 'vue'
 import RegisterForm from '@/components/auth-page/register-form/RegisterForm.vue'
 import { useAuthStore } from '@/stores/auth.store.ts'
 
+// Handle Login Expiration
+const authStore = useAuthStore()
 /** We either show the Login Form or the Create Account Form based on the route */
 const route = useRoute()
 const showLogin = ref(true)
 
 // We check route when DOM mounts
 onMounted(() => {
+  console.log('Auth Page', JSON.stringify(authStore.ssoPayload))
   showLogin.value = route.name === 'login' ? (showLogin.value = true) : (showLogin.value = false)
 })
 
@@ -28,8 +31,7 @@ watch(
   }
 )
 
-// Handle Login Expiration
-const authStore = useAuthStore()
+
 const showLoginExpiredAlert = computed(() => {
   return authStore.authExpired
 })

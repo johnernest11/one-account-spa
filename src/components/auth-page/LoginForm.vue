@@ -1,17 +1,27 @@
 <script setup lang="ts">
 import EmailSection from '@/components/auth-page/login-form/LoginFormEmail.vue'
 import PasswordSection from '@/components/auth-page/login-form/LoginFormPassword.vue'
-import { useAuthStore } from '@/stores/auth.store.ts'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeMount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/auth.store.ts'
+
 
 /** We either show the Login Form or the Create Account Form based on the route */
 const route = useRoute()
 const showLogin = ref(true)
+const appName = ref<string|undefined>('')
+const authStore = useAuthStore()
+
+onBeforeMount( async () => {
+  await authStore.fetchClientId(authStore.ssoPayload?.client_id)
+  appName.value = authStore.ssoPayload?.name
+})
 
 // We check route when DOM mounts
 onMounted(() => {
+  
   showLogin.value = route.name === 'login' ? (showLogin.value = true) : (showLogin.value = false)
+  
 })
 
 // We toggle background color of the Webkit text on the left side based on form errors and warnings
@@ -29,7 +39,6 @@ watch(
 )
 
 // Handle Login Expiration
-const authStore = useAuthStore()
 const showLoginExpiredAlert = computed(() => {
   return authStore.authExpired
 })
@@ -50,9 +59,7 @@ const handlePreviousButtonClicked = () => {
   <div class="text-surface text-center lg:text-surface-800">
     <img src="@/assets/image/DSWDUNO.png" width="100" class="mx-auto  my-1"  />
     <div class="text-center text-primary-900">
-      <h5>Sign In to continue to <strong>Records</strong></h5>
-      <h3><b>Management and</b></h3>
-      <h1><strong>Disposition Information System</strong></h1>
+      Sign In to continue to <b>{{appName}}</b>
     </div>
   </div>
 </div>
