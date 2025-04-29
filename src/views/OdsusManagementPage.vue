@@ -1,27 +1,29 @@
 <script setup lang="ts">
 import Paginator, { PageState } from 'primevue/paginator'
 import Button from 'primevue/button'
-import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext'
 import InputGroup from 'primevue/inputgroup'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
 import Dialog from 'primevue/dialog'
+// import { OdsuResponse } from '@/typings/models.types.ts'
 import { onBeforeMount, ref, watch } from 'vue'
-import { useUsersStore } from '@/stores/users.store.ts'
+import { useOdsusStore } from '@/stores/odsus.store.ts'
 import { ApiResponsePagination } from '@/typings/http-resources.types.ts'
-import UserCard from '@/components/users-management-page/UserCard.vue'
 import { useRolesStore } from '@/stores/roles.store.ts'
-import { useToast } from 'primevue/usetoast'
-import CreateUserForm from '@/components/users-management-page/CreateUserForm.vue'
+import CreateOdsuForm from '@/components/odsus-management-page/CreateOdsuForm.vue'
+import OdsuButton from '@/components/odsus-management-page/OdsuButton.vue'
+// import OdsuDetailsForm from '@/components/odsus-management-page/OdsuDetailsForm.vue'
 
 /** Initial Users Fetch & Role Options */
-const usersStore = useUsersStore()
+const odsusStore = useOdsusStore()
 const usersListIsLoading = ref(false)
 const rolesStore = useRolesStore()
 const rolesOptionsIsLoading = ref(false)
-const paginationLimit = 12
+const paginationLimit = 10
 onBeforeMount(async () => {
   usersListIsLoading.value = true
-  const response = await usersStore.fetchUsers(roleFilter.value, paginationLimit)
+  const response = await odsusStore.fetchOdsus(searchQuery.value, paginationLimit)
   if (response.success && response.pagination) {
     pagination.value = response.pagination
   }
@@ -36,9 +38,10 @@ onBeforeMount(async () => {
 const pagination = ref<ApiResponsePagination | null>(null)
 const handlePaginationPageChange = async (event: PageState) => {
   const pageSelected = event.page + 1 // The page state object starts at 0
+  
 
   usersListIsLoading.value = true
-  const response = await usersStore.fetchUsers(roleFilter.value, paginationLimit, pageSelected)
+  const response = await odsusStore.fetchOdsus(searchQuery.value, paginationLimit, pageSelected)
 
   if (response.success && response.pagination) {
     pagination.value = response.pagination
@@ -46,10 +49,10 @@ const handlePaginationPageChange = async (event: PageState) => {
 
   usersListIsLoading.value = false
 }
-
+/** End of Pagination */
 /** Create User Dialog */
-const showCreateUserDialog = ref(false)
-const toggleCreateUserDialog = () => (showCreateUserDialog.value = !showCreateUserDialog.value)
+const showCreateOdsuDialog = ref(false)
+const toggleCreateOdsuDialog = () => (showCreateOdsuDialog.value = !showCreateOdsuDialog.value)
 
 /** Search and Filters */
 const roleFilter = ref<number | null>(null)
@@ -59,7 +62,7 @@ watch(
   async () => {
     usersListIsLoading.value = true
     searchQuery.value = null // We clear the search query
-    const response = await usersStore.fetchUsers(roleFilter.value, paginationLimit)
+    const response = await odsusStore.fetchOdsus(paginationLimit)
     if (response.success && response.pagination) {
       pagination.value = response.pagination
     }
@@ -67,12 +70,11 @@ watch(
   }
 )
 
-const toast = useToast()
 const handleSearchUser = async () => {
   // We do regular fetch if the query is null / empty
   usersListIsLoading.value = true
   if (!searchQuery.value) {
-    const response = await usersStore.fetchUsers(roleFilter.value, paginationLimit)
+    const response = await odsusStore.fetchOdsus(searchQuery.value, paginationLimit)
     if (response.success && response.pagination) {
       pagination.value = response.pagination
     }
@@ -80,20 +82,15 @@ const handleSearchUser = async () => {
   }
 
   // Handle the search if the search query
-  const response = await usersStore.searchUsers(searchQuery.value)
+  const response = await odsusStore.searchOdsus(searchQuery.value)
   if (response.success && response.pagination) {
     pagination.value = response.pagination
-    roleFilter.value = null
-    toast.add({
-      severity: 'success',
-      summary: 'Search Users',
-      detail: 'Note that role filters are ignored',
-      life: 4000,
-    })
+    searchQuery.value = null
   }
 
   usersListIsLoading.value = false
 }
+/** End of Search and Filters */
 </script>
 
 <template>
@@ -109,7 +106,7 @@ const handleSearchUser = async () => {
           severity="secondary"
           outlined
           class="h-8 w-full !ring-surface-400 dark:text-surface-400 md:mx-0 md:h-fit md:w-fit md:text-xs"
-          @click="toggleCreateUserDialog"
+          @click="toggleCreateOdsuDialog"
         >
           <template #icon>
             <i class="pi pi-plus mr-2" />
@@ -117,33 +114,18 @@ const handleSearchUser = async () => {
         </Button>
       </div>
       <Dialog
-        v-model:visible="showCreateUserDialog"
+        v-model:visible="showCreateOdsuDialog"
         header="User Creation"
         modal
         :draggable="false"
         maximizable
         class="mx-2 w-full sm:mx-0"
       >
-        <CreateUserForm :current-role-filter="roleFilter" @user-created="toggleCreateUserDialog" />
+        <CreateOdsuForm :current-role-filter="roleFilter" @user-created="toggleCreateOdsuDialog" />
       </Dialog>
       <!-- End Create User Button -->
       <!-- Start Filter & Search Inputs -->
       <div class="flex w-full flex-col justify-end gap-4 md:flex-row">
-        <Dropdown
-          v-model="roleFilter"
-          :loading="rolesOptionsIsLoading"
-          :disabled="rolesOptionsIsLoading"
-          :options="rolesStore.roleOptions"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Filter by Role"
-          show-clear
-          class="md:min-w-52"
-        >
-          <template #loadingicon>
-            <i class="pi pi-spinner mr-2 animate-spin" />
-          </template>
-        </Dropdown>
         <InputGroup v-model="searchQuery">
           <InputText
             v-model="searchQuery"
@@ -158,32 +140,66 @@ const handleSearchUser = async () => {
       <!-- End Filter & Search Inputs -->
     </div>
     <!-- End Filters & Controls -->
-    <!-- Start User Cards -->
-    <div
-      v-if="!usersListIsLoading"
-      class="mt-6 grid grid-cols-1 gap-x-4 gap-y-12 rounded-2xl md:mt-8 md:grid-cols-3 lg:grid-cols-5"
-    >
-      <UserCard
-        v-for="user in usersStore.users"
-        :key="user.id"
-        :user="user"
-        :role-filter="roleFilter"
-        class="transition-all hover:scale-105 hover:cursor-pointer hover:shadow-xl"
-      />
-    </div>
-    <div
-      v-if="usersListIsLoading"
-      class="mt-6 grid grid-cols-1 gap-x-4 gap-y-12 rounded-2xl md:mt-8 md:grid-cols-3 lg:grid-cols-4"
-    >
-      <div
-        v-for="i in 4"
-        :key="i"
-        class="flex min-h-56 animate-pulse flex-col items-center justify-center rounded-lg bg-surface-100 p-1 shadow-md dark:bg-surface-800"
-      >
-        <i class="pi pi-spinner animate-spin text-lg text-surface-400" />
+    <!-- Start of Data Table -->
+    <div class="h-[100 %] mx-auto flex w-full flex-col">
+      <div class="flex flex-col px-4">
+        <div class="flex flex-col md:flex-row"></div>
+        <h1><strong>Odsus</strong></h1>
+        <span> Browse list of odsu`s accounts to manage their respective access </span>
+        <DataTable :value="odsusStore.odsus" class="mt-6" dataKey="id">
+          <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
+          <Column field="Code" header="Code">
+            <template #body="props">
+              <p class="uppercase text-surface-600 font-semibold">
+                {{ props.data.code }}
+              </p>
+              <span>{{ props.data.uuid }}</span>
+            </template>
+          </Column>
+          <Column field="Name" header="Name">
+            <template #body="props">
+              <p class="uppercase text-surface-600">
+                {{ props.data.name }}
+              </p>
+            </template>
+          </Column>
+          <Column field="Parent Code" header="Parent Code">
+            <template #body="props">
+              <span>   {{ props.data.parent_code }}</span>
+            </template>
+          </Column>
+          <Column field="position" header="POSITION">
+            <template #body="props">
+              <p class="uppercase text-surface-600">
+                {{ props.data.uuid }}
+              </p>
+            </template>
+          </Column>
+          <Column field="Office Type" header="Office Type">
+            <template #body="{ data }">
+              <span v-if="data.office_type == '0'">
+                <div class="w-3 h-3 bg-green-400 rounded-full inline-block mr-2"></div> Office I
+              </span>
+              <span v-else>
+                <div class="w-3 h-3 bg-red-400 rounded-full inline-block mr-2"></div> N/A
+              </span>
+            </template>
+          </Column>
+          <Column field="action" header="ACTION">
+            <template #body="props">
+              <OdsuButton :odsu="props.data" :role-filter="roleFilter" class="transition-all hover:scale-105 hover:cursor-pointer hover:shadow-xl" />
+            </template>
+          </Column>
+        </DataTable>
       </div>
     </div>
-    <!-- End User Cards -->
+    <div v-if="usersListIsLoading" class="flex min-h-56 animate-pulse flex-col items-center justify-center">
+      <i class="pi pi-spinner animate-spin text-xl text-surface-400" />
+    </div>
+    <!-- End of Data Table -->
+
+ 
+
     <!-- Start Pagination -->
     <div class="mt-6 flex w-full justify-center md:mt-10">
       <Paginator
@@ -197,13 +213,13 @@ const handleSearchUser = async () => {
       />
     </div>
     <!-- End Pagination -->
-    <!-- Start No Users Message -->
+     <!-- Start No Users Message -->
     <div
       v-if="!usersListIsLoading && !pagination?.total"
       class="flex w-fit flex-col items-center self-center font-menu text-lg dark:text-surface-300"
     >
       <i class="pi pi-exclamation-triangle text-2xl"></i>
-      <p class="mt-2">No users found</p>
+      <p class="mt-2">No odsus found</p>
     </div>
     <!-- End No Users Message -->
   </div>

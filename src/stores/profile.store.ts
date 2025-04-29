@@ -12,6 +12,7 @@ export type UploadProfilePictureResponse = { owner_id: string | number; path: st
 
 export type UserProfilePayload = {
   email: string
+  guid: string
   first_name: string
   last_name: string
   middle_name: string | null
@@ -19,6 +20,7 @@ export type UserProfilePayload = {
   mobile_number: string | null
   sex: 'male' | 'female' | null
   birthday: string | null
+  position: string | null
   home_address: string | null
   barangay_id: string | number | null
   city_id: string | number | null

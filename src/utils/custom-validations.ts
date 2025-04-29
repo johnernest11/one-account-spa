@@ -72,10 +72,30 @@ export const mobilePhoneRule =
 
 const availabilityStore = useAvailabilitiesStore()
 /**
- * @description Async check if the email or mobile number is already taken
+ * @description Async check if the email or mobile number is already registered
  */
 export const uniqueUserIdentifierRule =
-  (key: 'mobile_number' | 'email', excludedId: string | number | undefined | null = null): any =>
+  (key: 'username' | 'email', excludedId: string | number | undefined | null = null): any =>
+    async (value: string) => {
+    /** @note We still need to check as the library can still take in non-string types at run time */
+      if (value === null || value === '' || value === undefined) return true
+
+      if (key === 'email') {
+      // Check if the email format is valid before making an API call
+        const validator = useVuelidate({ email: { email } }, { email: value })
+        const isValidFormat = await validator.value.$validate()
+        if (!isValidFormat) return true
+      } 
+
+      const res = await availabilityStore.checkUserUniqueIdentifierAvailability(key, value, excludedId || null)
+      return !res.data.is_available
+    }
+
+/**
+ * @description Async check if the email or mobile number is already taken
+ */
+export const uniqueUserIdentifierRules =
+  (key: 'username' | 'email', excludedId: string | number | undefined | null = null): any =>
     async (value: string) => {
     /** @note We still need to check as the library can still take in non-string types at run time */
       if (value === null || value === '' || value === undefined) return true
@@ -93,7 +113,7 @@ export const uniqueUserIdentifierRule =
       }
 
       const res = await availabilityStore.checkUserUniqueIdentifierAvailability(key, value, excludedId || null)
-      return !res.data.is_available
+      return res.data.is_available
     }
 
 /** @description Only allow certain file extensions **/

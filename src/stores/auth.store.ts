@@ -8,14 +8,16 @@ import { RegistrationPayload } from '@/stores/forms.store.ts'
 
 /** Typings */
 export type LoginEmailPayload = {
-  email: string | null
+  email?: string | null
 }
 
 export type LoginPayload = {
-  email: string | null
+  email?: string | null
+  username?: string | null
   password: string | null
   with_user?: boolean
   client_name?: string
+  application?: string
 }
 
 export type AuthResponse = {
@@ -105,6 +107,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const loginInfo = ref<LoginPayload>({
     email: null,
+    username: null,
     password: null,
   })
 
@@ -188,7 +191,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const login = async (payload: LoginPayload) => {
     payload.with_user = true
-    payload.client_name = 'Web Browser'
+    payload.client_name = 'One Account'
 
     const { data } = await useApiCall('auth/tokens').post(payload).json()
     const responseData: ApiResponseBody = data.value
@@ -209,6 +212,64 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     return responseData
+  }
+
+  const signInToApplication = async (payload: LoginPayload, appName: string) => {
+    payload.with_user = true
+    payload.client_name = appName || 'Single Sign-On'
+
+    const { data } = await useApiCall('auth/tokens').post(payload).json()
+    const responseData: ApiResponseBody = data.value
+
+    if (responseData.success) {
+      const response = responseData.data
+
+      // Handle Multi-Factor Authentication (MFA)
+      if (response && 'mfa_token' in response) {
+        const mfaResponse = response as MfaResponseData
+        mfaToken.value = mfaResponse.mfa_token
+        mfaSteps.value = mfaResponse.mfa_steps
+        return responseData // Return if MFA is required
+      }
+
+      const authResponse = response as AuthResponse
+      authenticationToken.value = authResponse.token
+      authenticatedUser.value = authResponse.user
+      authExpired.value = false
+
+      // Prepare the HR payload
+      const hrPayload = {
+        token: authResponse.token,
+        with_user: payload.with_user,
+        client_name: payload.client_name,
+        email: payload.email,
+        password: payload.password,
+        user: {
+          email: payload.email,
+          userId: authResponse.user.id,
+        },
+      }
+      await sendToHRSystem(hrPayload)
+      const hrCaresUrl = import.meta.env.VITE_SPA_SSO_URL
+      const url = `${hrCaresUrl}?token=${authResponse.token}`
+      window.location.replace(url)
+      return { success: true }
+    }
+  }
+
+  const sendToHRSystem = async (payload: { token: string; with_user: boolean; client_name: string; user: any }) => {
+    console.log('Sending to HR system with payload:', payload)
+    const hrCaresUrl = import.meta.env.VITE_API_SSO_URL
+    const response = await fetch(hrCaresUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+
+    const hrResponse = await response.json()
+    return hrResponse?.redirectUrl || null
   }
 
   const register = async (payload: RegistrationPayload) => {
@@ -370,6 +431,7 @@ export const useAuthStore = defineStore('auth', () => {
     authFullAddress,
     loginInfo,
     saveLoginEmailSection,
+    signInToApplication,
     login,
     register,
     logout,

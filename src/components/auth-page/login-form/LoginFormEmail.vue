@@ -2,7 +2,7 @@
 import WbInputText from '@/components/webkit/WbInputText.vue'
 import { reactive, ref } from 'vue'
 import useVuelidate from '@vuelidate/core'
-import { helpers, required, email } from '@vuelidate/validators'
+import { helpers, required } from '@vuelidate/validators'
 import { uniqueUserIdentifierRule } from '@/utils/custom-validations.ts'
 import Button from 'primevue/button'
 import { LoginEmailPayload, useAuthStore } from '@/stores/auth.store.ts'
@@ -10,8 +10,9 @@ import { useToast } from 'primevue/usetoast'
 
 /** Payload */
 const formStore = useAuthStore()
+
 const payload = reactive<LoginEmailPayload>({
-  email: formStore.loginInfo.email || null,
+  email: formStore.loginInfo.email || null
 })
 
 /** Events */
@@ -23,7 +24,7 @@ const formRules = {
   $lazy: true,
   email: {
     required: helpers.withMessage('Please enter your email address', required),
-    email: helpers.withMessage('Email format is invalid', email),
+    // email: helpers.withMessage('Email format is invalid', email),
     unique: helpers.withAsync(
       helpers.withMessage('We could not find the account', uniqueUserIdentifierRule('email')),
       async () => {
@@ -37,6 +38,8 @@ const formRules = {
 
 
 const validator = useVuelidate<LoginEmailPayload>(formRules, payload)
+// const newPayload = manageIfEmailIsUsername(Object.assign({}, payload))
+
 /** Form Submission State */
 const formIsSubmitting = ref(false);
 
@@ -60,6 +63,9 @@ const handleNextSection = async () => {
   emits('nextButtonClicked') // Emit event for successful validation
   formIsSubmitting.value = false; // Reset button state after success
 }
+
+
+
 </script>
 
 <template>
@@ -86,6 +92,8 @@ const handleNextSection = async () => {
           validation-error-message-class="text-xs text-error-300 font-bold lg:font-normal lg:text-error-500 dark:lg:text-error-300"
         >
         </WbInputText>
+
+        
       
         <!-- Start Action Buttons -->
         <div class="mt-4 flex items-center justify-between pt-6 pb-12">

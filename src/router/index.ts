@@ -5,6 +5,7 @@ import ProfilePage from '@/views/ProfilePage.vue'
 import SupportPage from '@/views/SupportPage.vue'
 import AboutUsPage from '@/views/AboutUsPage.vue'
 import AnnouncementsPage from '@/views/AnnouncementsPage.vue'
+import InformationSystemsPage from '@/views/InformationSystemsPage.vue'
 import { AuthRole, AuthType } from '@/typings/auth.types.ts'
 import { useAuthStore } from '@/stores/auth.store.ts'
 
@@ -41,12 +42,24 @@ const routes = [
     },
   },
   {
+    path: '/information-systems',
+    name: 'information-systems',
+    component: InformationSystemsPage,
+    meta: <RouteMeta>{
+      group: RouteGroup.HOME,
+      label: 'Information Systems',
+      isSidebarMenu: true,
+      authType: AuthType.AUTHENTICATED,
+      roles: [AuthRole.STANDARD_USER, AuthRole.ADMIN, AuthRole.SYSTEM_SUPPORT, AuthRole.SUPER_USER],
+    },
+  },
+  {
     path: '/support',
     name: 'support',
     component: SupportPage,
     meta: <RouteMeta>{
       group: RouteGroup.HOME,
-      label: 'Information Systems',
+      label: 'Support',
       isSidebarMenu: true,
       authType: AuthType.AUTHENTICATED,
       roles: [AuthRole.STANDARD_USER, AuthRole.ADMIN, AuthRole.SYSTEM_SUPPORT, AuthRole.SUPER_USER],
@@ -58,7 +71,7 @@ const routes = [
     component: AnnouncementsPage,
     meta: <RouteMeta>{
       group: RouteGroup.MANAGE,
-      label: 'User',
+      label: 'Annoucements',
       isSidebarMenu: true,
       authType: AuthType.AUTHENTICATED,
       roles: [AuthRole.STANDARD_USER, AuthRole.ADMIN, AuthRole.SYSTEM_SUPPORT, AuthRole.SUPER_USER],
@@ -179,6 +192,30 @@ const routes = [
         component: () => import('@/views/UsersManagementPage.vue'),
         meta: <RouteMeta>{
           label: 'User Management',
+          isSidebarMenu: true,
+          group: RouteGroup.MANAGE,
+          authType: AuthType.AUTHENTICATED,
+          roles: [AuthRole.ADMIN, AuthRole.SUPER_USER],
+        },
+      },
+      {
+        path: 'user-active-directory',
+        name: 'user-active-directory',
+        component: () => import('@/views/UserActiveDirectoryPage.vue'),
+        meta: <RouteMeta>{
+          label: 'Active Directory',
+          isSidebarMenu: true,
+          group: RouteGroup.MANAGE,
+          authType: AuthType.AUTHENTICATED,
+          roles: [AuthRole.ADMIN, AuthRole.SUPER_USER],
+        },
+      },
+      {
+        path: 'odsu-management',
+        name: 'odsu-management',
+        component: () => import('@/views/OdsusManagementPage.vue'),
+        meta: <RouteMeta>{
+          label: 'Odsu Management',
           isSidebarMenu: true,
           group: RouteGroup.MANAGE,
           authType: AuthType.AUTHENTICATED,

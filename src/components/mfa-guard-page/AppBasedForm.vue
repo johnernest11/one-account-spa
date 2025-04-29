@@ -239,7 +239,9 @@ const handleShowOtpInput = () => {
           <FontAwesomeIcon icon="fa-solid fa-key" class="mr-2" />
         </template>
       </Button>
-      <Button v-if="showQrCode" @click="handleQrCodeContinue" label="Continue" class="py-2 px-4 text-sm font-medium text-white bg-primary-900 rounded-lg w-full sm:w-auto justify-self-end mx-2">
+      <Button v-if="showQrCode" @click="handleQrCodeContinue" label="Continue" 
+      class="py-2 px-4 text-sm font-medium text-white bg-primary-900 rounded-lg w-full sm:w-auto justify-self-end mx-2"
+      >
         <template #icon>
           <FontAwesomeIcon icon="fa-solid fa-arrow-circle-right" class="mr-2" />
         </template>

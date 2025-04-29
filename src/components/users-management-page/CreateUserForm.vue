@@ -3,7 +3,7 @@ import { computed, onBeforeMount, reactive, ref, toRef, toRefs } from 'vue'
 import { UserPayload, useUsersStore } from '@/stores/users.store.ts'
 import useVuelidate from '@vuelidate/core'
 import { email, helpers, maxLength, minLength, required, sameAs } from '@vuelidate/validators'
-import { digitCountRule, mobilePhoneRule, passwordRule, uniqueUserIdentifierRule } from '@/utils/custom-validations.ts'
+import { digitCountRule, mobilePhoneRule, passwordRule, uniqueUserIdentifierRules } from '@/utils/custom-validations.ts'
 import { useToast } from 'primevue/usetoast'
 import { parseApiResponseError } from '@/utils/error-handle.ts'
 import WbAutoComplete, { WbAutoCompleteOption, WbAutoCompleteOptionTrueValue } from '@/components/webkit/WbAutoComplete.vue'
@@ -117,13 +117,13 @@ const formRules = {
   email: {
     required: helpers.withMessage('The email address is required', required),
     email: helpers.withMessage('Email format is invalid', email),
-    unique: helpers.withAsync(helpers.withMessage('This email is already taken', uniqueUserIdentifierRule('email'))),
+    unique: helpers.withAsync(helpers.withMessage('This email is already taken', uniqueUserIdentifierRules('email'))),
   },
   mobile_number: {
     mobile_number: helpers.withMessage('Must be a valid PH mobile number', mobilePhoneRule()),
-    unique: helpers.withAsync(
-      helpers.withMessage('This mobile number is already taken', uniqueUserIdentifierRule('mobile_number'))
-    ),
+    // unique: helpers.withAsync(
+    //   helpers.withMessage('This username is already taken', uniqueUserIdentifierRules('username'))
+    // ),
   },
   first_name: {
     required: helpers.withMessage('First name is required', required),
