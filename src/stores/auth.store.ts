@@ -424,7 +424,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const fetchMfaQrCode = async () => {
-    const { data } = await useApiCall('auth/mfa/generate-qrcode')
+    const { data } = await useSSOApiCall('auth/mfa/generate-qrcode')
       .post({
         token: mfaToken.value,
       })
