@@ -12,45 +12,30 @@ const appNameSystem = ref('')
 const appNameSystems = ref('')
 onMounted(async () => {
   try {
-    const urlParams = new URLSearchParams(window.location.search);
-    let appRedirect = urlParams.get("redirect");
-    console.log(appRedirect);
-    let service = urlParams.get("service") || 'defaultService';
-    console.log(service);
-    appName.value = applications[service].name;
-    appNameSystem.value = applications[service].names;
-    appNameSystems.value = applications[service].namess;
-    
+    const urlParams = new URLSearchParams(window.location.search)
+    let appRedirect = urlParams.get('redirect')
+    let service = urlParams.get('service') || 'defaultService'
+    console.log(appRedirect, service)
+
+    if (applications[service]) {
+      appName.value = applications[service].name
+      appNameSystem.value = applications[service].names
+      appNameSystems.value = applications[service].namess
+    } else {
+      console.warn(`No application found for service: ${service}`)
+    }
   } catch (error) {
-    console.error('Error fetching app name:', error);
-    // Handle error gracefully, e.g., display a fallback message
+    console.error('Error fetching app name:', error)
   }
   showLogin.value = route.name === 'login'
 })
-/** We either show the Login Form or the Create Account Form based on the route */
+
 const route = useRoute()
 const showLogin = ref(true)
 
-// We check route when DOM mounts
-onMounted(() => {
-  showLogin.value = route.name === 'login' ? (showLogin.value = true) : (showLogin.value = false)
-})
-
-// We toggle background color of the Webkit text on the left side based on form errors and warnings
 const formHasError = ref(false)
 const formHasWarning = ref(false)
 
-// We also watch for route changes
-watch(
-  () => route.name,
-  (name) => {
-    showLogin.value = name === 'login'
-    formHasError.value = false
-    formHasWarning.value = false
-  }
-)
-
-// Handle Login Expiration
 const authStore = useAuthStore()
 const showLoginExpiredAlert = computed(() => {
   return authStore.authExpired
@@ -65,7 +50,6 @@ watch(
     formHasWarning.value = false
   }
 )
-/** Component States */
 const activeStep = ref(0)
 const handleNextButtonClicked = () => {
   activeStep.value++

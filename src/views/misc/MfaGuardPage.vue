@@ -1,21 +1,34 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed, watch, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store.ts'
 import { useToast } from 'primevue/usetoast'
 import { ApiErrorCode } from '@/typings/http-resources.types.ts'
 import { snakeCaseToTitleCase } from '@/utils/helpers.ts'
 import DeliveryBasedForm from '@/components/mfa-guard-page/DeliveryBasedForm.vue'
 import AppBasedForm from '@/components/mfa-guard-page/AppBasedForm.vue'
+import { applications } from '@/composables/sso/applications'
 
 /** Handle Logout **/
 const router = useRouter()
 const authStore = useAuthStore()
 
 /** Handle MFA code verification **/
+const appName = ref('')
+const urlParams = new URLSearchParams(window.location.search)
 const toast = useToast()
+const service = urlParams.get('service') || 'defaultService'
+if (applications[service]) {
+  appName.value = applications[service].application
+}
 const handleMfaCodeVerification = async (mfaCode: string) => {
-  const response = await authStore.verifyMfaCode(mfaCode)
+  let response
+  if (service && applications[service]) {
+    response = await authStore.verifySSOMfaCode(mfaCode)
+  } else {
+    response = await authStore.verifyMfaCode(mfaCode)
+  }
+
 
   if (!response.success && response.error_code !== ApiErrorCode.TOO_MANY_REQUESTS_ERROR) {
     toast.add({
@@ -73,43 +86,68 @@ const currentStepNumber = computed(() => {
   }, 1)
 })
 
-const route = useRoute()
 watch(
   () => authStore.allMfaStepsCompeted,
   async (completed) => {
     if (!completed) return
 
-    // Handle route redirection from account verification page with params and queries (to the OTP page)
-    if (route.query.from === 'verify-account') {
-      return await router.replace({
-        name: route.query.from,
-        params: {
-          id: route.query.id as string,
-          hash: route.query.hash as string,
-        },
-        query: {
-          expires: route.query.expires,
-          signature: route.query.signature,
-        },
-      })
-    }
+    const authenticatedUser = authStore.authenticatedUser
+    const authenticationToken = authStore.authenticationToken
 
-    // Handle a regular redirect if the `from` query exists (to the OTP page)
-    if (route.query.from) {
-      try {
-        return await router.replace({ name: route.query.from as string })
-      } catch (e) {
-        return await router.replace({ name: 'dashboard' })
+    if (authenticationToken && authenticatedUser) {
+      if (service && applications[service]) {
+        // ✅ SSO logic ONLY for SSO
+        const hrPayload = {
+          token: authenticationToken,
+          with_user: true,
+          client_name: 'Single Sign-On',
+          email: authenticatedUser.email,
+          user: {
+            email: authenticatedUser.email,
+            userId: authenticatedUser.id,
+          },
+        }
+
+        await sendToApplication(hrPayload)
+
+        const hrCaresUrl = import.meta.env.VITE_SPA_SSO_URL
+        const url = `${hrCaresUrl}?token=${authenticationToken}`
+        window.location.replace(url)
+
+        sessionStorage.removeItem('auth-token')
+        sessionStorage.removeItem('auth-user')
+        sessionStorage.removeItem('mfa-token')
+        sessionStorage.removeItem('mfa-steps')
+      } else {
+        console.log('MFA completed for standard login (no SSO).')
+        // 🚨 Add optional behavior here for non-SSO if needed
       }
+    } else {
+      console.error('Authentication token or user not available after MFA completion.')
+      await router.replace({ name: 'login' })
     }
-
-    await router.replace({ name: 'dashboard' })
   }
 )
+
 
 const stepStatus = computed(() => {
   return totalSteps.value && totalSteps.value > 1 ? '(' + currentStepNumber.value + '/' + totalSteps.value + ')' : ''
 })
+
+const sendToApplication = async (payload: { token: string; with_user: boolean; client_name: string; user: any }) => {
+  console.log('Sending to HR system with payload:', payload)
+  const hrCaresUrl = import.meta.env.VITE_API_SSO_URL
+  const response = await fetch(hrCaresUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+
+  const hrResponse = await response.json()
+  return hrResponse?.redirectUrl || null
+}
 </script>
 
 <template>

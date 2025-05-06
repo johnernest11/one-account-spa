@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { StorageSerializers, useDateFormat, useStorage } from '@vueuse/core'
 import { computed, ref } from 'vue'
-import { useApiCall } from '@/composables/network.ts'
+import { useApiCall, useSSOApiCall } from '@/composables/network.ts'
 import { ApiResponseBody } from '@/typings/http-resources.types.ts'
 import { UserResponse } from '@/typings/models.types.ts'
 import { RegistrationPayload } from '@/stores/forms.store.ts'
@@ -218,7 +218,7 @@ export const useAuthStore = defineStore('auth', () => {
     payload.with_user = true
     payload.client_name = appName || 'Single Sign-On'
 
-    const { data } = await useApiCall('auth/tokens').post(payload).json()
+    const { data } = await useSSOApiCall('auth/tokens').post(payload).json()
     const responseData: ApiResponseBody = data.value
 
     if (responseData.success) {
@@ -249,15 +249,21 @@ export const useAuthStore = defineStore('auth', () => {
           userId: authResponse.user.id,
         },
       }
-      await sendToHRSystem(hrPayload)
+      await sendToApplication(hrPayload)
       const hrCaresUrl = import.meta.env.VITE_SPA_SSO_URL
       const url = `${hrCaresUrl}?token=${authResponse.token}`
       window.location.replace(url)
+
+      sessionStorage.removeItem('auth-token')
+      sessionStorage.removeItem('auth-user')
+      sessionStorage.removeItem('mfa-token')
+      sessionStorage.removeItem('mfa-steps')
+
       return { success: true }
     }
   }
 
-  const sendToHRSystem = async (payload: { token: string; with_user: boolean; client_name: string; user: any }) => {
+  const sendToApplication = async (payload: { token: string; with_user: boolean; client_name: string; user: any }) => {
     console.log('Sending to HR system with payload:', payload)
     const hrCaresUrl = import.meta.env.VITE_API_SSO_URL
     const response = await fetch(hrCaresUrl, {
@@ -376,6 +382,36 @@ export const useAuthStore = defineStore('auth', () => {
     return responseBody
   }
 
+  const verifySSOMfaCode = async (code: string) => {
+    const { data } = await useSSOApiCall('auth/mfa/verify-code')
+      .post({
+        token: mfaToken.value,
+        code: code,
+      })
+      .json()
+
+    const responseBody = data.value as ApiResponseBody
+    if (responseBody.success) {
+      // Mark the MFA step as complete
+      for (const step of mfaSteps.value) {
+        if (!step.completed && step.name === currentMfaStep.value?.name) {
+          step.completed = true
+          break
+        }
+      }
+
+      // If all steps are completed, an auth token is returned, and we log in the user
+      if (allMfaStepsCompeted.value && responseBody.data && 'token' in responseBody.data) {
+        const authResponse = responseBody.data as AuthResponse
+        authenticationToken.value = authResponse.token
+        authenticatedUser.value = authResponse.user
+        authExpired.value = false
+      }
+    }
+
+    return responseBody
+  }
+
   const verifyMfaBackupCode = async (code: string) => {
     const { data } = await useApiCall('auth/mfa/verify-backup-code')
       .post({
@@ -443,6 +479,7 @@ export const useAuthStore = defineStore('auth', () => {
     mfaSteps,
     resendMfaCode,
     verifyMfaCode,
+    verifySSOMfaCode,
     currentMfaStep,
     fetchMfaQrCode,
     allMfaStepsCompeted,

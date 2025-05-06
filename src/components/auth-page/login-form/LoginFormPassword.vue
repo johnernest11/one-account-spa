@@ -124,11 +124,23 @@ formIsSubmitting.value = false
   // If MFA is enabled, the mfa_token and mfa_steps will be populated
   // and the user is not authenticated
   if (authStore.mfaToken && !authStore.isAuthenticated) {
+     const queryParams: any = {
+        from: route.query.from, 
+     };
+    const currentRouteQueryParams = route.query;
+    for (const key in currentRouteQueryParams) {
+        if (Object.prototype.hasOwnProperty.call(currentRouteQueryParams, key)) {
+            if (key !== 'from') {
+                if (currentRouteQueryParams[key] !== undefined) {
+                    queryParams[key] = currentRouteQueryParams[key];
+                }
+            }
+        }
+    }
+
     return await router.replace({
       name: 'mfa-guard-page',
-      query: {
-        from: route.query.from,
-      },
+      query: queryParams,
     })
   }
 
