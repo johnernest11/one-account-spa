@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import Card from 'primevue/card'
 import Button from 'primevue/button'
-import AppLogo from '@/components/layout/AppLogo.vue'
 import WbInputText from '@/components/webkit/WbInputText.vue'
 import { computed, reactive, ref } from 'vue'
 import { email, required, helpers, minLength, maxLength, sameAs } from '@vuelidate/validators'
@@ -9,7 +7,6 @@ import useVuelidate from '@vuelidate/core'
 import { ResetPasswordPayload, useAuthStore } from '@/stores/auth.store.ts'
 import { useToast } from 'primevue/usetoast'
 import Message from 'primevue/message'
-import AnimatedFloaters from '@/components/misc/AnimatedFloaters.vue'
 import { passwordRule } from '@/utils/custom-validations.ts'
 import { useRoute, useRouter } from 'vue-router'
 import WbPassword from '@/components/webkit/WbPassword.vue'
@@ -78,36 +75,40 @@ const handleSubmitForm = async () => {
 </script>
 
 <template>
+      <section>
+        <div class="relative flex min-h-screen">
   <div
-    :class="`flex h-full w-full flex-col items-center bg-gradient-to-b pt-2 transition-colors md:pt-6 ${
+    :class="`flex h-full w-full flex-col items-center pt-2 transition-colors md:pt-14 ${
       showErrorAlert
         ? 'from-error-500 to-error-900 dark:from-error-800'
         : 'from-primary-500 to-primary-900 dark:from-primary-800 dark:to-primary-950'
     }`"
   >
-    <!-- Start Alert Message -->
-    <transition enter-active-class="transition duration-200" enter-from-class="scale-50 opacity-0" leave-to-class="opacity-0">
-      <Message v-if="showErrorAlert" :closable="false" severity="error" class="mx-4 mb-6 md:mx-0">
-        <span> The link has either expired, so please double check your inbox, or you've entered an incorrect email. </span>
-      </Message>
-    </transition>
-    <!-- End Alert Message -->
-    <Card :class="`z-10 mx-2 max-w-3xl px-0.5 md:mx-0 md:px-2 ${showErrorAlert ? 'lg:mt-0' : 'lg:mt-8'}`">
-      <template #content>
-        <div class="flex flex-col">
-          <form autocomplete="off" @submit.prevent>
-            <div class="item-center mb-8 flex justify-between">
-              <AppLogo />
-              <Button label="Back to Login" text size="small" @click="$router.push({ name: 'login' })" class="text-xs">
-                <template #icon><i class="pi pi-arrow-left mr-2 hidden md:block" /></template>
-              </Button>
+  <img src="@/assets/image/DesignTop.png" class="absolute top-0 w-full mx-auto" />
+    <img src="@/assets/image/DesignBelow.png" class="absolute bottom-0 w-full mx-auto" />
+    <!-- <br> -->
+        <!-- Start Alert Message -->
+          <transition enter-active-class="transition duration-100" enter-from-class="scale-50 opacity-0" leave-to-class="opacity-0">
+            <Message v-if="showErrorAlert" :closable="false" severity="error" class="mx-4 mb-6 md:mx-0">
+              <span> The link has either expired, so please double check your inbox, or you've entered an incorrect email. </span>
+            </Message>
+          </transition>
+        <!-- End Alert Message -->
+         <!--Start Form-->
+        <div :class="` flex justify-center z-10 mx-2 max-w-3xl px-0.5 md:mx-0 md:px-2  ${showErrorAlert ? 'lg:mt-0' : 'lg:mt-8'}`">
+          <form class="w-3/4 md:w-3/5 lg:w-3/5  mt-6 flex flex-col space-y-2"  @submit.prevent>
+            <div class="item-center  flex justify-between">
+              <img src="@/assets/image/DSWDUNO.png" width="100" class="mx-auto my-1" />
             </div>
-            <div class="mb-8">
-              <h1 class="mb-1 font-menu text-lg text-surface-800 dark:text-surface-100 sm:text-xl">Reset Your Password?</h1>
-              <p class="text-sm leading-relaxed text-surface-600 dark:text-surface-300">
+            <div class="mb-6">
+             <h1 class="mb-4 text-center text-2xl font-semibold dark:text-gray-200">Reset Your Password?</h1>
+             <div class="text-center text-surface-0 lg:text-surface-800">
+              <p class="mb-2 mt-2 text-sm text-primary-900">
                 Enter the email you've used to request this link and input your new password.
               </p>
+              </div>
             </div>
+             
             <div class="flex flex-col gap-4">
               <WbInputText
                 v-model="payload.email"
@@ -154,25 +155,32 @@ const handleSubmitForm = async () => {
               </WbPassword>
             </div>
 
-            <div class="mt-6 flex w-full flex-col items-end">
+            <div class="mt-4 flex items-center justify-between pt-6 pb-12">
+              <Button 
+                label="Back to Login" 
+                text size="small" @click="$router.push({ name: 'login' })"   
+                class="text-xs text-surface-600 lg:text-surface-800 font-sans">
+                <template #icon><i class="pi pi-arrow-left mr-2 hidden md:block" /></template>
+              </Button>
               <Button
                 label="Submit"
                 :loading="formIsLoading"
                 :disabled="formIsLoading"
                 @click="handleSubmitForm"
-                class="w-full md:w-auto"
+                 class="bg-primary-900"
               >
                 <template #icon>
                   <i class="pi pi-send mr-2"></i>
                 </template>
               </Button>
+              
             </div>
           </form>
         </div>
-      </template>
-    </Card>
-    <AnimatedFloaters class="opacity-75" />
+            <!-- End Form -->
   </div>
+  </div>
+</section>
 </template>
 
 <style scoped></style>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { reactive, ref, watch } from 'vue'
+import {  UserProfilePayload } from '@/stores/profile.store.ts'
 import { useGlobalUiStore } from '@/stores/ui.store.ts'
 import { sleep } from '@/utils/helpers.ts'
 import { useThemeConfig } from '@/composables/theme.ts'
@@ -9,6 +10,24 @@ import WbAvatarFileInput from '@/components/webkit/WbAvatarFileInput.vue'
 import Card from 'primevue/card'
 
 const authStore = useAuthStore()
+const payload = reactive<UserProfilePayload>({
+  email: authStore.authenticatedUser?.email || '',
+  guid: authStore.authenticatedUser?.guid || '',
+  mobile_number: authStore.authenticatedUser?.user_profile?.mobile_number || null,
+  first_name: authStore.authenticatedUser?.user_profile?.first_name || '',
+  last_name: authStore.authenticatedUser?.user_profile?.last_name || '',
+  middle_name: authStore.authenticatedUser?.user_profile?.middle_name || null,
+  ext_name: authStore.authenticatedUser?.user_profile?.ext_name || null,
+  birthday: authStore.authenticatedUser?.user_profile?.birthday || null,
+  sex: authStore.authenticatedUser?.user_profile?.sex || null,
+  position: authStore.authenticatedUser?.user_profile?.position || null,
+  home_address: authStore.authenticatedUser?.user_profile?.address?.home_address || null,
+  city_id: authStore.authenticatedUser?.user_profile?.address?.city?.id || null,
+  province_id: authStore.authenticatedUser?.user_profile?.address?.province?.id || null,
+  region_id: authStore.authenticatedUser?.user_profile?.address?.region?.id || null,
+  postal_code: authStore.authenticatedUser?.user_profile?.address?.postal_code || null,
+  barangay_id: authStore.authenticatedUser?.user_profile?.address?.barangay?.id || null,
+})
 
 /** We Force Update the page to eliminate the delay when hiding the sidebar in desktop view*/
 const uiStore = useGlobalUiStore()
@@ -51,7 +70,7 @@ watch(
           </template>
           <div class="card-header">
             <h3 class="font-bold">Welcome, {{ authStore.authFullName }}</h3>
-            <p class="font-bold text-gray-700">Computer Programmer III</p>
+            <p class="font-bold text-gray-700">{{ payload.position }}</p>
             <div class="my-4">
               <hr />
             </div>
@@ -81,12 +100,12 @@ watch(
             </div>
             <div class="mt-6 justify-items-start">
               <span class="text-gray-600"
-                >GUID <strong class="text-gray-1000">{{ authStore.authFullName }}</strong></span
+                >GUID:  <strong class="text-gray-1000">{{ payload.guid }}</strong></span
               >
             </div>
             <div class="mt-2 justify-items-start">
               <span class="text-gray-600"
-                >Active Directory (AD) Account Username <strong>{{ authStore.authFullName }}</strong></span
+                >Active Directory (AD) Account Username: <strong>{{ payload.last_name }}</strong></span
               >
             </div>
             <hr />
@@ -117,7 +136,7 @@ watch(
               >
             </div>
             <div class="mt-2 justify-items-start">
-              <span class="text-gray-600">Email Address: <strong>(Not Provided)</strong></span>
+              <span class="text-gray-600">Email Address: <strong>{{ payload.email }}</strong></span>
             </div>
             <hr />
             <div class="flex-col justify-center text-center">

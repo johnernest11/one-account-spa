@@ -7,7 +7,7 @@ import { useAuthStore } from '@/stores/auth.store.ts'
 import { useAddressStore } from '@/stores/address.store.ts'
 import useVuelidate from '@vuelidate/core'
 import { helpers, required, maxLength } from '@vuelidate/validators'
-import { digitCountRule, mobilePhoneRule, uniqueUserIdentifierRule } from '@/utils/custom-validations.ts'
+import { digitCountRule } from '@/utils/custom-validations.ts'
 import { parseApiResponseError } from '@/utils/error-handle.ts'
 import { sleep } from '@/utils/helpers.ts'
 import WbInputText from '@/components/webkit/WbInputText.vue'
@@ -110,15 +110,6 @@ const globalStringMaxLengthRule = helpers.withMessage(
 )
 const formRules = {
   $lazy: true,
-  mobile_number: {
-    mobile_number: helpers.withMessage('Must be a valid PH mobile number', mobilePhoneRule()),
-    unique: helpers.withAsync(
-      helpers.withMessage(
-        'This mobile number is already taken',
-        uniqueUserIdentifierRule('mobile_number', authStore.authenticatedUser?.id)
-      )
-    ),
-  },
   first_name: {
     required: helpers.withMessage('Please enter your first name', required),
     maxLength: globalStringMaxLengthRule,

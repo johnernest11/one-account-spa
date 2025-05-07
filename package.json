@@ -26,6 +26,7 @@
     "@vueuse/core": "^10.7.1",
     "@vueuse/integrations": "^10.9.0",
     "apexcharts": "^3.45.2",
+    "cors": "^2.8.5",
     "libphonenumber-js": "^1.10.53",
     "pinia": "^2.1.7",
     "primeicons": "^6.0.1",
@@ -33,7 +34,8 @@
     "sortablejs": "^1.15.2",
     "vue": "^3.3.11",
     "vue-router": "^4.2.5",
-    "vue3-apexcharts": "^1.5.2"
+    "vue3-apexcharts": "^1.5.2",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.8",

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import WbInputText from '@/components/webkit/WbInputText.vue'
+// import WbInputText from '@/components/webkit/WbInputText.vue'
 import Message from 'primevue/message'
 import Button from 'primevue/button'
 import WbPassword from '@/components/webkit/WbPassword.vue'
@@ -8,9 +8,11 @@ import useVuelidate from '@vuelidate/core'
 import { helpers, required } from '@vuelidate/validators'
 import { useRoute, useRouter } from 'vue-router'
 import { LoginPayload, LoginEmailPayload, useAuthStore } from '@/stores/auth.store.ts'
-import { ApiErrorCode } from '@/typings/http-resources.types.ts'
+import { ApiErrorCode,ApiResponseBody } from '@/typings/http-resources.types.ts'
 import { useSettingsStore } from '@/stores/settings.store.ts'
+import { applications } from '@/composables/sso/applications'
 import { useToast } from 'primevue/usetoast'
+
 
 /** Emits */
 const emit = defineEmits<{
@@ -23,8 +25,7 @@ const props = withDefaults(defineProps<{ showLoginExpiredAlert: boolean }>(), {
   showLoginExpiredAlert: false,
 })
 
-const route = useRoute()
-const HideEmailInput = ref(false) 
+const route = useRoute() 
 /** Payload */
 const formStore = useAuthStore()
 const payloads = reactive<LoginEmailPayload>({
@@ -51,17 +52,30 @@ const showCredsErrorAlert = ref(false)
 const credsErrorMessage = ref('')
 const router = useRouter()
 const authStore = useAuthStore()
-const toast = useToast()
-// const emailcheck =uniqueUserIdentifierRule
 const settingsStore = useSettingsStore()
+const toast = useToast()
+const appName = ref("");
+const urlParams = new URLSearchParams(window.location.search);
+const service = urlParams.get("service") || 'defaultService';
+if (applications[service]) {
+  appName.value = applications[service].application; 
+}
 const handleLogin = async () => {
   formIsSubmitting.value = true
   const valid = await validator.value.$validate()
   if (!valid) return (formIsSubmitting.value = false)
 
-  const res = await authStore.login(payload || payloads)
+  const newPayload = manageIfEmailIsUsername(Object.assign({}, payload))
+  let response: ApiResponseBody | undefined
 
-  if (!res.success) {
+  if (!service || !applications[service]) {
+    response = await authStore.login(newPayload);
+} else {
+  response = await authStore.signInToApplication(newPayload, appName.value)
+  
+}
+
+if (!response?.success ) {
     toast.add({
       severity: 'error',
       summary: 'Invalid  Password',
@@ -69,13 +83,12 @@ const handleLogin = async () => {
       life: 5000,
     })
   }
-
-  // Handle unsuccessful login attempt
-  if (!res.success) {
+// Handle unsuccessful login attempt
+if (!response?.success) {
     formIsSubmitting.value = false
     showCredsErrorAlert.value = true
 
-    switch (res.error_code) {
+    switch (response?.error_code) {
       case ApiErrorCode.INVALID_CREDENTIALS_ERROR:
       case ApiErrorCode.VALIDATION_ERROR:
         credsErrorMessage.value = "The credentials you've entered are incorrect"
@@ -90,12 +103,12 @@ const handleLogin = async () => {
       default:
         credsErrorMessage.value = 'Unable to login to your account. Please contact our support team.'
     }
-
     emit('onCredentialsError', true)
     return
   }
+formIsSubmitting.value = false
 
-  formIsSubmitting.value = false
+ 
 
   // Handle Login -> MFA Guard -> Verify Account flow if MFA is enabled
   if (route.query.from === 'verify-account' && settingsStore.mfaIsEnabled) {
@@ -129,11 +142,23 @@ const handleLogin = async () => {
   // If MFA is enabled, the mfa_token and mfa_steps will be populated
   // and the user is not authenticated
   if (authStore.mfaToken && !authStore.isAuthenticated) {
+     const queryParams: any = {
+        from: route.query.from, 
+     };
+    const currentRouteQueryParams = route.query;
+    for (const key in currentRouteQueryParams) {
+        if (Object.prototype.hasOwnProperty.call(currentRouteQueryParams, key)) {
+            if (key !== 'from') {
+                if (currentRouteQueryParams[key] !== undefined) {
+                    queryParams[key] = currentRouteQueryParams[key];
+                }
+            }
+        }
+    }
+
     return await router.replace({
       name: 'mfa-guard-page',
-      query: {
-        from: route.query.from,
-      },
+      query: queryParams,
     })
   }
 
@@ -141,14 +166,33 @@ const handleLogin = async () => {
   if (route.query.from) {
     return await router.replace({ name: route.query.from as string })
   }
-
-  // For normal log-ins, we go the dashboard page for verified emails, and to the guard page for those who
-  // have un-verified emails
-  if (authStore.authenticatedUser.email_verified_at) {
-    return await router.replace({ name: 'dashboard' })
-  } else {
-    return await router.replace({ name: 'verify-email-guard' })
+      // For normal log-ins, we go the dashboard page for verified emails, and to the guard page for those who
+      if (authStore.authenticatedUser.email_verified_at) {
+        return await router.replace({ name: 'dashboard' })
+      } else {
+        return await router.replace({ name: 'verify-email-guard' })
+      }  
   }
+
+
+    const manageIfEmailIsUsername = (payload: LoginPayload) => {
+      // Combine conditions for efficiency and security
+      if (isValidEmail(payload.email as string)) {
+        // Email is valid, keep it as-is
+        return payload;
+      } else {
+        // Email is invalid OR not provided, use it as username (if present)
+        if (payload.email) {
+          payload.username = payload.email; // Use email as username even if invalid
+        }
+        delete payload.email; // Remove potentially invalid email
+      }
+      return payload;
+    };
+// Function to validate email format (basic validation, adjust as needed)
+    function isValidEmail(email: string): boolean {
+      const emailRegex = /^\w+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      return emailRegex.test(email);
 }
 </script>
 
@@ -169,6 +213,12 @@ const handleLogin = async () => {
             </Button>
          </p>
       </p>
+       <!-- Start Alert Message -->
+    <transition enter-active-class="transition duration-200" enter-from-class="scale-50 opacity-0" leave-to-class="opacity-0">
+      <Message v-if="showCredsErrorAlert" :closable="false" severity="error">
+        <span>{{ credsErrorMessage }}</span>
+      </Message>
+    </transition>
       <!-- Start Auth Token Expired Message -->
       <transition enter-active-class="transition duration-200" enter-from-class="scale-50 opacity-0" leave-to-class="opacity-0">
         <Message v-if="props.showLoginExpiredAlert && !showCredsErrorAlert" :closable="false" severity="warn">
@@ -178,16 +228,7 @@ const handleLogin = async () => {
       <!-- End Auth Token Expired Message -->
     </div>
     <!-- Start Form -->
-        <template v-if="HideEmailInput">
-          <WbInputText
-            v-model="payload.email"
-            label="Email or mobile number"
-            :invalid="validator.email.$invalid"
-          :invalid-text="validator.email.$errors[0]?.$message"
-          label-class="text-xs text-surface-500 lg:text-surface-500"
-          validation-error-message-class="text-xs text-error-300 font-bold lg:font-normal lg:text-error-500 dark:lg:text-error-300"
-          ></WbInputText>
-        </template>
+        
         
         <WbPassword
           v-model="payload.password"
