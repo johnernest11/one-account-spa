@@ -107,10 +107,8 @@ const publicStores = useOdsusStore()
 const odusesAreLoading = ref(false)
 onBeforeMount(async () => {
   addressesAreLoading.value = true
-  await Promise.allSettled([
-    publicStores.fetchOdsuses(),
-  ])
-
+  await publicStores.fetchOdsuses()
+  
   // Set the initial value of the selected odsuses
   selectedOdus.value = publicStores.odsusOptions.find((r) => r.value 
   === props.user.user_profile?.odsu?.id) || null

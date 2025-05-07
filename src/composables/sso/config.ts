@@ -1,3 +1,4 @@
+
 interface SSOApplication {
   url: string;
   application: string;
@@ -7,28 +8,8 @@ interface SSOApplication {
 
 export const applications: { [key: string]: SSOApplication } = {
   hr_cares: {
-    url: "http://localhost:3001",
-    application: "Human Resources CARES",
-  },
-  rrptp: {
-    url: "http://rrptp-fo1.dswdfo1.internal",
-    application: "Recovery and Reintegration Program for Trafficked Persons",
-  },
-  promisys: {
-    url: "http://promisys.dswdfo1.internal/",
-    application: "Procurement Management Information System",
-  },
-  rmds: {
-    url: "http://promisys.dswdfo1.internal/",
-    application: "Records Management and Disposition System",
-  },
-  bp: {
-    url: "http://broilerplate.dswdfo1.internal/",
-    application: "Laravel-Blade Broilerplate",
-  },
-  uno_apps: {
-    url: "http://localhost:9002/",
-    application: "UNO Applications",
+    url: import.meta.env.VITE_SPA_SSO_URL,
+    application: "Human Resource Comprehensive Access to Records",
   },
 };
 

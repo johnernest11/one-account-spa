@@ -8,7 +8,7 @@ import { RegistrationPayload } from '@/stores/forms.store.ts'
 
 /** Typings */
 export type LoginEmailPayload = {
-  email?: string | null
+  email: string | null
 }
 
 export type LoginPayload = {

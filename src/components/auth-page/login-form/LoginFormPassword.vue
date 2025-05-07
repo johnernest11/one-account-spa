@@ -8,6 +8,7 @@ import useVuelidate from '@vuelidate/core'
 import { helpers, required } from '@vuelidate/validators'
 import { useRoute, useRouter } from 'vue-router'
 import { LoginPayload, LoginEmailPayload, useAuthStore } from '@/stores/auth.store.ts'
+import { ApiErrorCode,ApiResponseBody } from '@/typings/http-resources.types.ts'
 import { useSettingsStore } from '@/stores/settings.store.ts'
 import { applications } from '@/composables/sso/applications'
 import { useToast } from 'primevue/usetoast'
@@ -48,6 +49,7 @@ const validator = useVuelidate<LoginPayload>(formRules, payload)
 /** Form Submission */
 const formIsSubmitting = ref(false)
 const showCredsErrorAlert = ref(false)
+const credsErrorMessage = ref('')
 const router = useRouter()
 const authStore = useAuthStore()
 const settingsStore = useSettingsStore()
@@ -64,30 +66,46 @@ const handleLogin = async () => {
   if (!valid) return (formIsSubmitting.value = false)
 
   const newPayload = manageIfEmailIsUsername(Object.assign({}, payload))
+  let response: ApiResponseBody | undefined
 
   if (!service || !applications[service]) {
-  await authStore.login(newPayload);
+    response = await authStore.login(newPayload);
 } else {
-  const res = await authStore.signInToApplication(newPayload, appName.value);
-  if (res) { 
-    if (res.success) {
-      toast.add({
-        severity: 'success',
-        summary: 'Successfully Login',
-        detail: "The credentials you've entered are correct",
-        life: 5000,
-      });
-    }
-  } else {
-    toast.add({
-      severity: 'error',
-      summary: 'Invalid Password',
-      detail: "The credentials you've entered are incorrect",
-      life: 5000,
-    });
-  }
+  response = await authStore.signInToApplication(newPayload, appName.value)
+  
 }
 
+if (!response?.success ) {
+    toast.add({
+      severity: 'error',
+      summary: 'Invalid  Password',
+      detail: "The credentials you've entered are incorrect",
+      life: 5000,
+    })
+  }
+// Handle unsuccessful login attempt
+if (!response?.success) {
+    formIsSubmitting.value = false
+    showCredsErrorAlert.value = true
+
+    switch (response?.error_code) {
+      case ApiErrorCode.INVALID_CREDENTIALS_ERROR:
+      case ApiErrorCode.VALIDATION_ERROR:
+        credsErrorMessage.value = "The credentials you've entered are incorrect"
+        break
+      case ApiErrorCode.FORBIDDEN_ERROR:
+        credsErrorMessage.value =
+          "We're sorry, but your account login is currently disabled. To reactivate your account, please contact support."
+        break
+      case ApiErrorCode.TOO_MANY_REQUESTS_ERROR:
+        credsErrorMessage.value = "We've received too many attempts from you. Please try again after a few minutes."
+        break
+      default:
+        credsErrorMessage.value = 'Unable to login to your account. Please contact our support team.'
+    }
+    emit('onCredentialsError', true)
+    return
+  }
 formIsSubmitting.value = false
 
  
@@ -195,6 +213,12 @@ formIsSubmitting.value = false
             </Button>
          </p>
       </p>
+       <!-- Start Alert Message -->
+    <transition enter-active-class="transition duration-200" enter-from-class="scale-50 opacity-0" leave-to-class="opacity-0">
+      <Message v-if="showCredsErrorAlert" :closable="false" severity="error">
+        <span>{{ credsErrorMessage }}</span>
+      </Message>
+    </transition>
       <!-- Start Auth Token Expired Message -->
       <transition enter-active-class="transition duration-200" enter-from-class="scale-50 opacity-0" leave-to-class="opacity-0">
         <Message v-if="props.showLoginExpiredAlert && !showCredsErrorAlert" :closable="false" severity="warn">

@@ -66,37 +66,13 @@ const handleMfaCodeVerification = async (mfaCode: string) => {
       detail: 'OTP verification success. Continue to the next step.',
       life: 4000,
     })
-  }
-
-  return true
-}
-
-/** Handle MFA Step Management **/
-const totalSteps = computed(() => {
-  if (!authStore.mfaSteps) return null
-
-  return authStore.mfaSteps.length
-})
-
-const currentStepNumber = computed(() => {
-  if (!authStore.mfaSteps) return null
-
-  return authStore.mfaSteps.reduce((count, step) => {
-    return count + (step.completed ? 1 : 0)
-  }, 1)
-})
-
-watch(
-  () => authStore.allMfaStepsCompeted,
-  async (completed) => {
-    if (!completed) return
-
+  } else {
+    // Handle MFA completion directly here
     const authenticatedUser = authStore.authenticatedUser
     const authenticationToken = authStore.authenticationToken
 
     if (authenticationToken && authenticatedUser) {
       if (service && applications[service]) {
-        // ✅ SSO logic ONLY for SSO
         const hrPayload = {
           token: authenticationToken,
           with_user: true,
@@ -120,15 +96,30 @@ watch(
         sessionStorage.removeItem('mfa-steps')
       } else {
         console.log('MFA completed for standard login (no SSO).')
-        // 🚨 Add optional behavior here for non-SSO if needed
       }
     } else {
       console.error('Authentication token or user not available after MFA completion.')
       await router.replace({ name: 'login' })
     }
   }
-)
 
+  return true
+}
+
+/** Handle MFA Step Management **/
+const totalSteps = computed(() => {
+  if (!authStore.mfaSteps) return null
+
+  return authStore.mfaSteps.length
+})
+
+const currentStepNumber = computed(() => {
+  if (!authStore.mfaSteps) return null
+
+  return authStore.mfaSteps.reduce((count, step) => {
+    return count + (step.completed ? 1 : 0)
+  }, 1)
+})
 
 const stepStatus = computed(() => {
   return totalSteps.value && totalSteps.value > 1 ? '(' + currentStepNumber.value + '/' + totalSteps.value + ')' : ''

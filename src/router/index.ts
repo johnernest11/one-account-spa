@@ -215,7 +215,7 @@ const routes = [
         name: 'odsu-management',
         component: () => import('@/views/OdsusManagementPage.vue'),
         meta: <RouteMeta>{
-          label: 'Odsu Management',
+          label: 'ODSU',
           isSidebarMenu: true,
           group: RouteGroup.MANAGE,
           authType: AuthType.AUTHENTICATED,
