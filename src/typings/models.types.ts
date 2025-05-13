@@ -54,6 +54,8 @@ export type AddressResponse = {
 /** User (HTTP Responses) */
 export type UserResponse = {
   email: string
+  guid: string | null
+  domain: string | null
   active: boolean
   email_verified_at: string
   roles: Array<{ id: string | number; name: string }>
@@ -69,9 +71,25 @@ export type UserProfileResponse = {
   telephone_number: string | null
   sex: 'male' | 'female' | null
   birthday: string | null
+  position: string | null
   full_name: string
   profile_picture_url: string | null
   address: AddressResponse
+  odsu?:OdsuResponse
+} & ApiResponseData
+
+export type OdsuResponse = {
+  uuid: string
+  code: string
+  name: string 
+  head_user_id: string | null
+  cluster_code: string | null
+  parent_code: string | null
+  directorate_code: string | null
+  office_type: string | null
+  added_by_user_id: string
+  last_modified_by_user_id: string | null
+  user_profile?: UserProfileResponse
 } & ApiResponseData
 
 /** Role (HTTP Responses) */

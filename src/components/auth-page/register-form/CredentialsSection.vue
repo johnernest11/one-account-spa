@@ -4,7 +4,7 @@ import WbPassword from '@/components/webkit/WbPassword.vue'
 import { reactive, computed } from 'vue'
 import useVuelidate from '@vuelidate/core'
 import { helpers, required, email, minLength, maxLength, sameAs } from '@vuelidate/validators'
-import { mobilePhoneRule, passwordRule, uniqueUserIdentifierRule } from '@/utils/custom-validations.ts'
+import {passwordRule, uniqueUserIdentifierRule } from '@/utils/custom-validations.ts'
 import Button from 'primevue/button'
 import Divider from 'primevue/divider'
 import WbInputMask from '@/components/webkit/WbInputMask.vue'
@@ -30,12 +30,6 @@ const formRules = {
     required: helpers.withMessage('Please enter your email address', required),
     email: helpers.withMessage('Email format is invalid', email),
     unique: helpers.withAsync(helpers.withMessage('This email is already taken', uniqueUserIdentifierRule('email'))),
-  },
-  mobile_number: {
-    unique: helpers.withAsync(
-      helpers.withMessage('This mobile number is already taken', uniqueUserIdentifierRule('mobile_number'))
-    ),
-    mobile_number: helpers.withMessage('Must be a valid PH mobile number', mobilePhoneRule()),
   },
   password: {
     required: helpers.withMessage('Please enter your password', required),

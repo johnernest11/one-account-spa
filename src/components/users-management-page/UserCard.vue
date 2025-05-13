@@ -28,7 +28,7 @@ const toggleUserDetailsDialog = () => (showUserDetailsDialog.value = !showUserDe
       />
       <div
         v-if="!props.user.user_profile?.profile_picture_url"
-        class="flex h-full w-full items-center justify-center rounded-lg bg-primary-700 text-xl text-surface-0 dark:bg-primary-400 dark:text-surface-900"
+        class="flex h-full w-full items-center justify-center rounded-lg bg-primary-900 text-xl text-surface-0 dark:bg-primary-400 dark:text-surface-900"
       >
         {{ getAvatarDisplayNamePlaceholder(props.user.user_profile?.full_name || 'User') }}
       </div>

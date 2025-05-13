@@ -26,6 +26,7 @@ export type UserPayload = {
   city_id?: string | number | null
   province_id?: string | number | null
   region_id?: string | number | null
+  odsu_id?:string | number |null
   postal_code?: string | null
   home_address?: string | null
 }
@@ -52,7 +53,7 @@ export const useUsersStore = defineStore('users', () => {
 
     return responseBody
   }
-
+ 
   const searchUsers = async (query: string | null) => {
     let uri = '/users/search?'
     if (query) uri += `query=${query}`
