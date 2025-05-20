@@ -218,7 +218,7 @@ export const useAuthStore = defineStore('auth', () => {
     payload.with_user = true
     payload.client_name = appName || 'Single Sign-On'
 
-    const { data } = await useSSOApiCall('auth/tokens').post(payload).json()
+    const { data } = await useApiCall('auth/tokens').post(payload).json()
     const responseData: ApiResponseBody = data.value
 
     if (responseData.success) {
