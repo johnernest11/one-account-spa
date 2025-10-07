@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import InputOtp from 'primevue/inputotp'
 import Button from 'primevue/button'
-import { reactive,ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import { useAuthStore, LoginEmailPayload } from '@/stores/auth.store.ts'
 import { maskEmail } from '@/utils/custom-validations.ts'
@@ -20,9 +20,8 @@ const payloads = reactive<LoginEmailPayload>({
   email: formStore.loginInfo.email || null,
 })
 
-const email = payloads.email;
-const MaskEmail = maskEmail(email as string); 
-
+const emails = payloads.email
+const MaskEmail = maskEmail(emails as string)
 
 /** Handle MFA code verification **/
 const mfaCode = ref('')
@@ -92,55 +91,57 @@ const handleResendMfaCode = async () => {
 </script>
 
 <template>
-    <div class="text-center text-surface-0 lg:text-surface-800 ">
-      <div class="flex w-full flex-col text-surface-600 lg:pt-24 sm:pt-0">
-        <img src="@/assets/image/DSWDUNO.png" width="150" class="mx-auto" />
-      </div>
-      <h5 class="text-md mb-0 mt-0 text-primary-900">
-        <b>Multi-Factor Authentication</b>
-      </h5>
-      <h3 class="text-md mb-0 mt-0 text-primary-900">
-        <span>{{ props.stepsStatus }}</span>
-        <b> {{ props.mfaName }} </b>
-      </h3>
-      <div class="flex w-full flex-col text-surface-600">
-        <p v-if="props.isFirstMfaStep" class="my-2 text-sm leading-relaxed dark:text-surface-100 text-primary-900">
-          We have sent a six-digit one-time-password <br> (OTP) to your email <strong>{{ MaskEmail }}</strong><br>
-          <strong class="text-black">Not you?.</strong>
-        </p>
-        <p v-else class="my-2 text-sm leading-relaxed dark:text-surface-100">
-          Use the <b>Send OTP</b> button to receive a six-digit one-time-password. Please enter the code to proceed.
-        </p>
-        <div class="mt-4 flex justify-center">
-          <InputOtp v-model="mfaCode" :length="6" integerOnly />
-        </div>
-        <div class="mt-4 flex items-center justify-between pt-6">
-          <div class="mt-4 flex w-full flex-col sm:items-start md:mt-0">
-            <p class="text-md ml-2">Did not receive the OTP?</p>
-            <Button
-              :disabled="resendMfaCodeButtonIsLocked"
-              :loading="mfaCodeIsBeingResent"
-              @click="handleResendMfaCode"
-              :label="`${props.isFirstMfaStep ? 'Re-send OTP' : 'Send OTP'}`"
-              class="text-md lg:text-primary-900 border-0"
-              size="small"
-              text
-            >
-              <strong>{{ `${props.isFirstMfaStep ? 'Re-send OTP' : 'Send OTP'}` }}</strong>
-            </Button>
-            <p v-if="resendMfaCodeButtonIsLocked" class="mt-1 text-center text-xs italic text-surface-600 sm:mt-3 lg:text-sm">
-              You can send again after <span class="font-bold">{{ resendMfaCodeButtonTimer }}</span> seconds
-            </p>
-          </div>
-          <Button
-            :loading="mfaCodeIsBeingVerified"
-            @click="handleCodeVerification(mfaCode)"
-            :disabled="!mfaCode"
-            label="Verify Code"
-            class="w-full bg-primary-900 text-white sm:w-40"
-          >
-          </Button>
-        </div>
-        </div>
+  <div class="text-center text-surface-0 lg:text-surface-800">
+    <div class="flex w-full flex-col text-surface-600 sm:pt-0 lg:pt-24">
+      <img src="@/assets/image/DSWDUNO.png" width="150" class="mx-auto" />
     </div>
+    <h5 class="text-md mb-0 mt-0 text-primary-900">
+      <b>Multi-Factor Authentication</b>
+    </h5>
+    <h3 class="text-md mb-0 mt-0 text-primary-900">
+      <span>{{ props.stepsStatus }}</span>
+      <b> {{ props.mfaName }} </b>
+    </h3>
+    <div class="flex w-full flex-col text-surface-600">
+      <p v-if="props.isFirstMfaStep" class="my-2 text-sm leading-relaxed text-primary-900 dark:text-surface-100">
+        We have sent a six-digit one-time-password <br />
+        (OTP) to your email <strong>{{ MaskEmail }}</strong
+        ><br />
+        <strong class="text-black">Not you?.</strong>
+      </p>
+      <p v-else class="my-2 text-sm leading-relaxed dark:text-surface-100">
+        Use the <b>Send OTP</b> button to receive a six-digit one-time-password. Please enter the code to proceed.
+      </p>
+      <div class="mt-4 flex justify-center">
+        <InputOtp v-model="mfaCode" :length="6" integerOnly />
+      </div>
+      <div class="mt-4 flex items-center justify-between pt-6">
+        <div class="mt-4 flex w-full flex-col sm:items-start md:mt-0">
+          <p class="text-md ml-2">Did not receive the OTP?</p>
+          <Button
+            :disabled="resendMfaCodeButtonIsLocked"
+            :loading="mfaCodeIsBeingResent"
+            @click="handleResendMfaCode"
+            :label="`${props.isFirstMfaStep ? 'Re-send OTP' : 'Send OTP'}`"
+            class="text-md border-0 lg:text-primary-900"
+            size="small"
+            text
+          >
+            <strong>{{ `${props.isFirstMfaStep ? 'Re-send OTP' : 'Send OTP'}` }}</strong>
+          </Button>
+          <p v-if="resendMfaCodeButtonIsLocked" class="mt-1 text-center text-xs italic text-surface-600 sm:mt-3 lg:text-sm">
+            You can send again after <span class="font-bold">{{ resendMfaCodeButtonTimer }}</span> seconds
+          </p>
+        </div>
+        <Button
+          :loading="mfaCodeIsBeingVerified"
+          @click="handleCodeVerification(mfaCode)"
+          :disabled="!mfaCode"
+          label="Verify Code"
+          class="w-full bg-primary-900 text-surface-0 sm:w-40"
+        >
+        </Button>
+      </div>
+    </div>
+  </div>
 </template>
