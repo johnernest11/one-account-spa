@@ -101,7 +101,7 @@ const handleLogin = async () => {
         credsErrorMessage.value = "We've received too many attempts from you. Please try again after a few minutes."
         break
       default:
-        credsErrorMessage.value = 'Unable to login to your account. Please contact our support team.'
+        credsErrorMessage.value = 'Your account is currently deactived. Please contact your our support team.'
     }
     emit('onCredentialsError', true)
     return
