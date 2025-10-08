@@ -87,16 +87,7 @@ const handleNextSection = async () => {
         </WbInputText>
 
         <!-- Start Action Buttons -->
-        <div class="mt-4 flex items-center justify-between pb-12 pt-6">
-          <Button
-            label="Forgot Email?"
-            size="small"
-            class="font-sans text-xs text-surface-600 lg:text-surface-800"
-            text
-            @click="$router.push({ name: 'forgot-password' })"
-          >
-          </Button>
-
+        <div class="mt-4 flex items-center justify-end pb-12 pt-6">
           <Button @click="handleNextSection" label="Next" size="large" :loading="formIsSubmitting" class="bg-primary-900">
           </Button>
         </div>

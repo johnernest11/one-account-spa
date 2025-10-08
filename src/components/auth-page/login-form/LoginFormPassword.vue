@@ -70,12 +70,12 @@ const handleLogin = async () => {
 
   if (!service || !applications[service]) {
     response = await authStore.login(newPayload);
-} else {
-  response = await authStore.signInToApplication(newPayload, appName.value)
+  } else {
+    response = await authStore.signInToApplication(newPayload, appName.value)
   
-}
+  }
 
-if (!response?.success ) {
+  if (!response?.success ) {
     toast.add({
       severity: 'error',
       summary: 'Invalid  Password',
@@ -83,8 +83,8 @@ if (!response?.success ) {
       life: 5000,
     })
   }
-// Handle unsuccessful login attempt
-if (!response?.success) {
+  // Handle unsuccessful login attempt
+  if (!response?.success) {
     formIsSubmitting.value = false
     showCredsErrorAlert.value = true
 
@@ -106,7 +106,7 @@ if (!response?.success) {
     emit('onCredentialsError', true)
     return
   }
-formIsSubmitting.value = false
+  formIsSubmitting.value = false
 
  
 
@@ -142,18 +142,18 @@ formIsSubmitting.value = false
   // If MFA is enabled, the mfa_token and mfa_steps will be populated
   // and the user is not authenticated
   if (authStore.mfaToken && !authStore.isAuthenticated) {
-     const queryParams: any = {
-        from: route.query.from, 
-     };
+    const queryParams: any = {
+      from: route.query.from, 
+    };
     const currentRouteQueryParams = route.query;
     for (const key in currentRouteQueryParams) {
-        if (Object.prototype.hasOwnProperty.call(currentRouteQueryParams, key)) {
-            if (key !== 'from') {
-                if (currentRouteQueryParams[key] !== undefined) {
-                    queryParams[key] = currentRouteQueryParams[key];
-                }
-            }
+      if (Object.prototype.hasOwnProperty.call(currentRouteQueryParams, key)) {
+        if (key !== 'from') {
+          if (currentRouteQueryParams[key] !== undefined) {
+            queryParams[key] = currentRouteQueryParams[key];
+          }
         }
+      }
     }
 
     return await router.replace({
@@ -166,33 +166,33 @@ formIsSubmitting.value = false
   if (route.query.from) {
     return await router.replace({ name: route.query.from as string })
   }
-      // For normal log-ins, we go the dashboard page for verified emails, and to the guard page for those who
-      if (authStore.authenticatedUser.email_verified_at) {
-        return await router.replace({ name: 'dashboard' })
-      } else {
-        return await router.replace({ name: 'verify-email-guard' })
-      }  
+  // For normal log-ins, we go the dashboard page for verified emails, and to the guard page for those who
+  if (authStore.authenticatedUser.email_verified_at) {
+    return await router.replace({ name: 'dashboard' })
+  } else {
+    return await router.replace({ name: 'verify-email-guard' })
+  }  
+}
+console.log('[DEBUG] MFA token:', authStore.mfaToken)
+
+const manageIfEmailIsUsername = (payload: LoginPayload) => {
+  // Combine conditions for efficiency and security
+  if (isValidEmail(payload.email as string)) {
+  // Email is valid, keep it as-is
+    return payload
+  } else {
+  // Email is invalid OR not provided, use it as username (if present)
+    if (payload.email) {
+      payload.username = payload.email // Use email as username even if invalid
+    }
+    delete payload.email // Remove potentially invalid email
   }
-
-
-    const manageIfEmailIsUsername = (payload: LoginPayload) => {
-      // Combine conditions for efficiency and security
-      if (isValidEmail(payload.email as string)) {
-        // Email is valid, keep it as-is
-        return payload;
-      } else {
-        // Email is invalid OR not provided, use it as username (if present)
-        if (payload.email) {
-          payload.username = payload.email; // Use email as username even if invalid
-        }
-        delete payload.email; // Remove potentially invalid email
-      }
-      return payload;
-    };
+  return payload
+}
 // Function to validate email format (basic validation, adjust as needed)
-    function isValidEmail(email: string): boolean {
-      const emailRegex = /^\w+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      return emailRegex.test(email);
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^\w+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailRegex.test(email);
 }
 </script>
 
@@ -203,7 +203,6 @@ formIsSubmitting.value = false
     <div class="text-center text-surface-0 lg:text-primary-800">
       <p class="mb-1 mt-2 text-sm text-primary-900">
         Welcome, <strong>{{ payload.email }} </strong><br />
-        <p>
           <Button 
               @click="emit('previousButtonClicked')"
               label=" Not you ?"
@@ -211,7 +210,6 @@ formIsSubmitting.value = false
               text
             >
             </Button>
-         </p>
       </p>
        <!-- Start Alert Message -->
     <transition enter-active-class="transition duration-200" enter-from-class="scale-50 opacity-0" leave-to-class="opacity-0">
@@ -242,15 +240,7 @@ formIsSubmitting.value = false
           validation-error-message-class="text-xs text-error-300 font-bold lg:font-normal lg:text-error-500 dark:lg:text-error-300"
         >
         </WbPassword>
-        <div class="mt-4 flex items-center justify-between pt-6 pb-12">
-          <Button
-            label="Forgot Password ?"
-            size="small"
-              class="text-xs text-surface-600 lg:text-surface-800 font-sans"
-            text
-            @click="$router.push({ name: 'forgot-password' })"
-          >
-          </Button>
+        <div class="mt-4 flex items-center justify-end pt-6 pb-12">
           <!-- Start Action Buttons -->
           <div class="mt-1 flex items-center justify-end ">
             <Button 
