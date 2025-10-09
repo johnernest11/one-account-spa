@@ -130,17 +130,17 @@ const handleUserDeletion = async () => {
 
   // Optional page reload, consider user experience and data consistency
   if (shouldReloadPageAfterOdsuDeletion()) {
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000); // Reload after toast disappears
-    }
+    setTimeout(() => {
+      window.location.reload()
+    }, 2000) // Reload after toast disappears
+  }
 
   odsuIsBeingDeleted.value = false
   emit('odsu-deleted', true)
 }
 const shouldReloadPageAfterOdsuDeletion = (): boolean => {
-  return true; // Replace with your actual logic
-};
+  return true // Replace with your actual logic
+}
 const confirm = useConfirm()
 const requireConfirmation = (event: Event) => {
   confirm.require({

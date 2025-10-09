@@ -6,7 +6,7 @@ import WbPassword from '@/components/webkit/WbPassword.vue'
 import { reactive, ref } from 'vue'
 import useVuelidate from '@vuelidate/core'
 import { helpers, required } from '@vuelidate/validators'
-import { useRoute, useRouter } from 'vue-router'
+import { LocationQueryValue, useRoute, useRouter } from 'vue-router'
 import { LoginPayload, LoginEmailPayload, useAuthStore } from '@/stores/auth.store.ts'
 import { ApiErrorCode,ApiResponseBody } from '@/typings/http-resources.types.ts'
 import { useSettingsStore } from '@/stores/settings.store.ts'
@@ -41,7 +41,7 @@ const payload = reactive<LoginPayload>({
 const formRules = {
   $lazy: true,
   password: {
-    required: helpers.withMessage('Enter your password', required),
+    required: helpers.withMessage('Enter your AD password', required),
   },
 }
 const validator = useVuelidate<LoginPayload>(formRules, payload)
@@ -54,11 +54,11 @@ const router = useRouter()
 const authStore = useAuthStore()
 const settingsStore = useSettingsStore()
 const toast = useToast()
-const appName = ref("");
-const urlParams = new URLSearchParams(window.location.search);
-const service = urlParams.get("service") || 'defaultService';
+const appName = ref('')
+const urlParams = new URLSearchParams(window.location.search)
+const service = urlParams.get('service') || 'defaultService'
 if (applications[service]) {
-  appName.value = applications[service].application; 
+  appName.value = applications[service].application
 }
 const handleLogin = async () => {
   formIsSubmitting.value = true
@@ -69,12 +69,11 @@ const handleLogin = async () => {
   let response: ApiResponseBody | undefined
 
   if (!service || !applications[service]) {
-    response = await authStore.login(newPayload);
+    response = await authStore.login(newPayload)
   } else {
     response = await authStore.signInToApplication(newPayload, appName.value)
   
   }
-
 
   // Handle unsuccessful login attempt
   if (!response?.success) {
@@ -83,11 +82,12 @@ const handleLogin = async () => {
 
     switch (response?.error_code) {
       case ApiErrorCode.INVALID_CREDENTIALS_ERROR:
+      case ApiErrorCode.LDAP_USER_ERROR:
       case ApiErrorCode.VALIDATION_ERROR:
         credsErrorMessage.value = "The credentials you've entered are incorrect"
         toast.add({
           severity: 'error',
-          summary: 'Invalid  Password',
+          summary: 'Invalid  Username or Password',
           detail: "The credentials you've entered are incorrect",
           life: 5000,
         })
@@ -99,6 +99,7 @@ const handleLogin = async () => {
       case ApiErrorCode.TOO_MANY_REQUESTS_ERROR:
         credsErrorMessage.value = "We've received too many attempts from you. Please try again after a few minutes."
         break
+      
       default:
         credsErrorMessage.value = 'Unable to login to your account. Please contact our support team.'
     }
@@ -141,15 +142,15 @@ const handleLogin = async () => {
   // If MFA is enabled, the mfa_token and mfa_steps will be populated
   // and the user is not authenticated
   if (authStore.mfaToken && !authStore.isAuthenticated) {
-    const queryParams: any = {
+    const queryParams: {from: LocationQueryValue | LocationQueryValue[]} = {
       from: route.query.from, 
-    };
-    const currentRouteQueryParams = route.query;
+    }
+    const currentRouteQueryParams = route.query
     for (const key in currentRouteQueryParams) {
       if (Object.prototype.hasOwnProperty.call(currentRouteQueryParams, key)) {
         if (key !== 'from') {
           if (currentRouteQueryParams[key] !== undefined) {
-            queryParams[key] = currentRouteQueryParams[key];
+            queryParams[key] = currentRouteQueryParams[key]
           }
         }
       }
@@ -189,9 +190,9 @@ const manageIfEmailIsUsername = (payload: LoginPayload) => {
   return payload
 }
 // Function to validate email format (basic validation, adjust as needed)
-function isValidEmail(email: string): boolean {
-  const emailRegex = /^\w+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  return emailRegex.test(email);
+const isValidEmail = (email: string): boolean => {
+  const emailRegex = /^\w+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+  return emailRegex.test(email)
 }
 </script>
 
@@ -229,7 +230,7 @@ function isValidEmail(email: string): boolean {
         
         <WbPassword
           v-model="payload.password"
-          label="Enter your password"
+          label="Enter your AD password"
           :feedback="false"
           toggleMask
           :invalid="validator.password.$invalid"

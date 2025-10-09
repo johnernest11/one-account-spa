@@ -221,52 +221,58 @@ export const useAuthStore = defineStore('auth', () => {
     const { data } = await useApiCall('auth/tokens').post(payload).json()
     const responseData: ApiResponseBody = data.value
 
-      if (!responseData.success) {
-        return responseData // ⬅ return even if error
-      }
-      const response = responseData.data
+    if (!responseData.success) {
+      return responseData // ⬅ return even if error
+    }
+    const response = responseData.data
 
-      // Handle Multi-Factor Authentication (MFA)
-      if (response && 'mfa_token' in response) {
-        const mfaResponse = response as MfaResponseData
-        mfaToken.value = mfaResponse.mfa_token
-        mfaSteps.value = mfaResponse.mfa_steps
-        return responseData // Return if MFA is required
-      }
+    // Handle Multi-Factor Authentication (MFA)
+    if (response && 'mfa_token' in response) {
+      const mfaResponse = response as MfaResponseData
+      mfaToken.value = mfaResponse.mfa_token
+      mfaSteps.value = mfaResponse.mfa_steps
+      return responseData // Return if MFA is required
+    }
 
-      const authResponse = response as AuthResponse
-      authenticationToken.value = authResponse.token
-      authenticatedUser.value = authResponse.user
-      authExpired.value = false
+    const authResponse = response as AuthResponse
+    authenticationToken.value = authResponse.token
+    authenticatedUser.value = authResponse.user
+    authExpired.value = false
 
-      // Prepare the HR payload
-      const hrPayload = {
-        token: authResponse.token,
-        with_user: payload.with_user,
-        client_name: payload.client_name,
+    // Prepare the HR payload
+    const hrPayload = {
+      token: authResponse.token,
+      with_user: payload.with_user,
+      client_name: payload.client_name,
+      email: payload.email,
+      password: payload.password,
+      user: {
         email: payload.email,
-        password: payload.password,
-        user: {
-          email: payload.email,
-          userId: authResponse.user.id,
-        },
-      }
-      await sendToApplication(hrPayload)
-      const hrCaresUrl = import.meta.env.VITE_SPA_SSO_URL
-      const url = `${hrCaresUrl}?token=${authResponse.token}`
-      window.location.replace(url)
+        userId: authResponse.user.id,
+      },
+    }
+    await sendToApplication(hrPayload)
+    const hrCaresUrl = import.meta.env.VITE_SPA_SSO_URL
+    const url = `${hrCaresUrl}?token=${authResponse.token}`
+    window.location.replace(url)
 
-      sessionStorage.removeItem('auth-token')
-      sessionStorage.removeItem('auth-user')
-      sessionStorage.removeItem('mfa-token')
-      sessionStorage.removeItem('mfa-steps')
+    sessionStorage.removeItem('auth-token')
+    sessionStorage.removeItem('auth-user')
+    sessionStorage.removeItem('mfa-token')
+    sessionStorage.removeItem('mfa-steps')
 
-      return { success: true }
-    
+    return { success: true }
   }
 
-  const sendToApplication = async (payload: { token: string; with_user: boolean; client_name: string; user: any }) => {
-    console.log('Sending to HR system with payload:', payload)
+  const sendToApplication = async (payload: {
+    token: string
+    with_user: boolean
+    client_name: string
+    user: {
+      email: string
+      userId: number | string
+    }
+  }) => {
     const hrCaresUrl = import.meta.env.VITE_API_SSO_URL
     const response = await fetch(hrCaresUrl, {
       method: 'POST',

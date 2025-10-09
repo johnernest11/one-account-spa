@@ -24,14 +24,14 @@ export const passwordRule = () => helpers.regex(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/
  * leaving only the first few characters and the domain visible.
  */
 export const maskEmail = (email: string, visibleChars: number = 2) => {
-  if (!email) return '';
+  if (!email) return ''
 
-  const [username, domain] = email.split('@');
-  const maskedDomain = domain.replace(/\./g, '*').replace(/^(.{3})./, '$1*').replace(/^(.{4})./, '$1*').replace(/^(.{5})./, '$1*');
-  const maskedUsername = username.slice(0, visibleChars) + username.slice(visibleChars).replace(/./g, '*');
+  const [username, domain] = email.split('@')
+  const maskedDomain = domain.replace(/\./g, '*').replace(/^(.{3})./, '$1*').replace(/^(.{4})./, '$1*').replace(/^(.{5})./, '$1*')
+  const maskedUsername = username.slice(0, visibleChars) + username.slice(visibleChars).replace(/./g, '*')
 
-  return `${maskedUsername}*${maskedDomain}`;
-};
+  return `${maskedUsername}*${maskedDomain}`
+}
 
 /**
  * @description Must have a certain count of digits

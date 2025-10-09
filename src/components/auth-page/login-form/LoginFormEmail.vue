@@ -74,8 +74,8 @@ const handleNextSection = async () => {
       <form class="mt-6 flex w-3/4 flex-col space-y-2 md:w-3/5 lg:w-3/5" @submit.prevent>
         <WbInputText
           v-model="payload.email"
-          placeholder="Enter your email"
-          label="Username or Email"
+          placeholder="Enter your AD Username"
+          label="AD Username"
           size="small"
           class="font-sans text-xs text-surface-800 lg:text-surface-800"
           @keyup.enter="handleNextSection"
