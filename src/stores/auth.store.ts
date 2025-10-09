@@ -269,7 +269,7 @@ export const useAuthStore = defineStore('auth', () => {
     with_user: boolean
     client_name: string
     user: {
-      email: string
+      email: string | null | undefined
       userId: number | string
     }
   }) => {

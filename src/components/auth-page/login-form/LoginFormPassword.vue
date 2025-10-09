@@ -6,7 +6,7 @@ import WbPassword from '@/components/webkit/WbPassword.vue'
 import { reactive, ref } from 'vue'
 import useVuelidate from '@vuelidate/core'
 import { helpers, required } from '@vuelidate/validators'
-import { LocationQueryValue, useRoute, useRouter } from 'vue-router'
+import {useRoute, useRouter } from 'vue-router'
 import { LoginPayload, LoginEmailPayload, useAuthStore } from '@/stores/auth.store.ts'
 import { ApiErrorCode,ApiResponseBody } from '@/typings/http-resources.types.ts'
 import { useSettingsStore } from '@/stores/settings.store.ts'
@@ -142,15 +142,15 @@ const handleLogin = async () => {
   // If MFA is enabled, the mfa_token and mfa_steps will be populated
   // and the user is not authenticated
   if (authStore.mfaToken && !authStore.isAuthenticated) {
-    const queryParams: {from: LocationQueryValue | LocationQueryValue[]} = {
-      from: route.query.from, 
-    }
+    const queryParams = {
+      from: route.query.from,
+    }          
     const currentRouteQueryParams = route.query
     for (const key in currentRouteQueryParams) {
       if (Object.prototype.hasOwnProperty.call(currentRouteQueryParams, key)) {
         if (key !== 'from') {
           if (currentRouteQueryParams[key] !== undefined) {
-            queryParams[key] = currentRouteQueryParams[key]
+            queryParams[key as keyof typeof queryParams] = currentRouteQueryParams[key]
           }
         }
       }
