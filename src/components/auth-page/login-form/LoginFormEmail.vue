@@ -7,6 +7,7 @@ import { uniqueUserIdentifierRule } from '@/utils/custom-validations.ts'
 import Button from 'primevue/button'
 import { LoginEmailPayload, useAuthStore } from '@/stores/auth.store.ts'
 import { useToast } from 'primevue/usetoast'
+import Message from 'primevue/message'
 
 /** Payload */
 const formStore = useAuthStore()
@@ -62,11 +63,16 @@ const handleNextSection = async () => {
 </script>
 
 <template>
-  <div class="text-center text-surface-0 lg:text-surface-800">
+  <div class="text-center text-surface-0 lg:text-surface-800 items-center flex flex-col">
     <p class="mb-2 mt-2 text-sm text-primary-900">
       Welcome, please use your active directory <br />
       account username to continue.
     </p>
+    <Message severity="info" :closable="false" class="w-80">
+      <p class=" whitespace-pre-wrap">
+        Active Directory (AD) account is the one you use to login to DSWD issued ICT Asset such as Desktop and/or Laptop.
+      </p>
+    </Message>
   </div>
   <section class="bg-transparent">
     <!-- Start Form -->

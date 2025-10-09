@@ -5,7 +5,6 @@ import { applications } from '@/composables/sso/applications'
 import { useAuthStore } from '@/stores/auth.store.ts'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import Message from 'primevue/message'
 
 
 const appName = ref('')
@@ -42,7 +41,6 @@ const showLoginExpiredAlert = computed(() => {
   return authStore.authExpired
 })
 
-
 watch(
   () => route.name,
   (name) => {
@@ -58,37 +56,28 @@ const handleNextButtonClicked = () => {
 const handlePreviousButtonClicked = () => {
   activeStep.value--
 }
-
-
-
 </script>
 <template>
   <section>
-<div class="flex justify-center items-start">
-  <img src="@/assets/image/DesignTop.png" class="absolute top-0 w-full mx-auto" />
-  <img src="@/assets/image/DesignBelow.png" class="absolute bottom-0 w-full mx-auto" />
-  <div class="text-surface text-center lg:text-surface-800">
-    <img src="@/assets/image/DSWDUNO.png" width="100" class="mx-auto  my-1"  />
-    <div class="text-center text-primary-900">
-      <h5 v-if="appName != ''">Sign In to continue to <strong v-text="appName"></strong></h5>
-        <p v-else>
-            Use your <b>Active Directory (AD)</b> account
-        </p>
-        <Message severity="info" :closable="false" class="w-80">
-          <p class="whitespace-pre-wrap w-">Active Directory (AD) account is the one you use to login to DSWD issued ICT Asset such as Desktop and/or Laptop. </p>
-        </Message>
-        <h1 v-if="appNameSystem != ''" ><b v-text="appNameSystem"></b></h1>
-        <h1 v-if="appNameSystems != ''" ><b v-text="appNameSystems"></b></h1>
+    <div class="flex items-start justify-center">
+      <img src="@/assets/image/DesignTop.png" class="absolute top-0 mx-auto w-full" />
+      <img src="@/assets/image/DesignBelow.png" class="absolute bottom-0 mx-auto w-full" />
+      <div class="text-surface  text-center lg:text-surface-800">
+        <img src="@/assets/image/DSWDUNO.png" width="100" class="mx-auto my-1" />
+        <div class="text-center text-primary-900">
+          <h5 v-if="appName != ''">Sign In to continue to <strong v-text="appName"></strong></h5>
+          <p v-else>Use your <b>Active Directory (AD)</b> account</p>
+
+          <h1 v-if="appNameSystem != ''"><b v-text="appNameSystem"></b></h1>
+          <h1 v-if="appNameSystems != ''"><b v-text="appNameSystems"></b></h1>
+        </div>
+        
+      </div>
     </div>
-  </div>
-</div>
     <div class="mt-1 flex justify-center">
-      <form @submit.prevent class="w-full max-w-md">  
-        <EmailSection
-          key="0"
-          v-if="activeStep === 0"
-          @next-button-clicked="handleNextButtonClicked"
-        />
+      <form @submit.prevent class="w-full max-w-md ">
+        
+        <EmailSection key="0" v-if="activeStep === 0" @next-button-clicked="handleNextButtonClicked" />
         <PasswordSection
           key="1"
           v-else-if="activeStep === 1"
