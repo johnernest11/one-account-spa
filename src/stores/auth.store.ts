@@ -221,7 +221,9 @@ export const useAuthStore = defineStore('auth', () => {
     const { data } = await useApiCall('auth/tokens').post(payload).json()
     const responseData: ApiResponseBody = data.value
 
-    if (responseData.success) {
+      if (!responseData.success) {
+        return responseData // ⬅ return even if error
+      }
       const response = responseData.data
 
       // Handle Multi-Factor Authentication (MFA)
@@ -260,7 +262,7 @@ export const useAuthStore = defineStore('auth', () => {
       sessionStorage.removeItem('mfa-steps')
 
       return { success: true }
-    }
+    
   }
 
   const sendToApplication = async (payload: { token: string; with_user: boolean; client_name: string; user: any }) => {

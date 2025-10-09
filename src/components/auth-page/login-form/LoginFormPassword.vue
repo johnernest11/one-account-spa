@@ -75,14 +75,7 @@ const handleLogin = async () => {
   
   }
 
-  if (!response?.success ) {
-    toast.add({
-      severity: 'error',
-      summary: 'Invalid  Password',
-      detail: "The credentials you've entered are incorrect",
-      life: 5000,
-    })
-  }
+
   // Handle unsuccessful login attempt
   if (!response?.success) {
     formIsSubmitting.value = false
@@ -92,6 +85,12 @@ const handleLogin = async () => {
       case ApiErrorCode.INVALID_CREDENTIALS_ERROR:
       case ApiErrorCode.VALIDATION_ERROR:
         credsErrorMessage.value = "The credentials you've entered are incorrect"
+        toast.add({
+          severity: 'error',
+          summary: 'Invalid  Password',
+          detail: "The credentials you've entered are incorrect",
+          life: 5000,
+        })
         break
       case ApiErrorCode.FORBIDDEN_ERROR:
         credsErrorMessage.value =
