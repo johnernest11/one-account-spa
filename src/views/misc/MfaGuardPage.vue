@@ -125,7 +125,10 @@ const stepStatus = computed(() => {
   return totalSteps.value && totalSteps.value > 1 ? '(' + currentStepNumber.value + '/' + totalSteps.value + ')' : ''
 })
 
-const sendToApplication = async (payload: { token: string; with_user: boolean; client_name: string; user: any }) => {
+const sendToApplication = async (payload: { token: string; with_user: boolean; client_name: string; user: {
+        email: string,
+        userId: number | string,
+      } }) => {
   console.log('Sending to HR system with payload:', payload)
   const hrCaresUrl = import.meta.env.VITE_API_SSO_URL
   const response = await fetch(hrCaresUrl, {

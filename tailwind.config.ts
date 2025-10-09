@@ -106,10 +106,15 @@ const tailwindConfig = {
           '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
           '40%, 60%': { transform: 'translate3d(4px, 0, 0)' },
         },
+        'grayscale-to-colored': {
+          '0%, 100%': { filter: 'grayscale(100)' },
+          '50%': { filter: 'grayscale(0)' },
+        },
       },
       animation: {
         'float-up': 'spin-up 25s linear infinite',
         shake: 'shake 0.82s cubic-bezier(.36,.07,.19,.97) both',
+        'grayscale-to-colored': 'grayscale-to-colored 1.5s ease infinite',
       },
     },
   },

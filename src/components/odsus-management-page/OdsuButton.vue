@@ -2,7 +2,7 @@
 import { OdsuResponse } from '@/typings/models.types.ts'
 import Dialog from 'primevue/dialog'
 import { ref } from 'vue'
-import OdsuDetailsForm from '@/components/odsus-management-page/OdsuDetailsForm.vue';
+import OdsuDetailsForm from '@/components/odsus-management-page/OdsuDetailsForm.vue'
 
 const props = defineProps<{ odsu: OdsuResponse; roleFilter: number | string | null }>()
 
