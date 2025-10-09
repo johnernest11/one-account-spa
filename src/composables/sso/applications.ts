@@ -8,7 +8,7 @@ interface Application {
 
 export const applications: { [key: string]: Application } = {
   hr_cares: {
-    name: 'Human Resources   ',
+    name: 'HRCARES',
     names: 'Human Resource Comprehensive Access to Records ',
     namess: 'and Employee Services ',
     application: 'HR-CARES',
