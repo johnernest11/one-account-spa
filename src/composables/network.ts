@@ -75,12 +75,23 @@ export const useSSOApiCall = (uri: string, authToken: string | null = null) => {
 
   if (apiUrl.hostname === 'localhost') {
     apiUrl.port = '8001'
-  } else {
-    apiUrl.hostname = apiUrl.hostname.replace(
-      /(-fo1\.dswd\.gov\.ph)$/,
-      '-api$1',
-    )
-  }
+  } else if (apiUrl.hostname.includes('staging-')) {
+      // Staging:
+      // staging-hr-cares-fo1.dswd.gov.ph
+      // → staging-hr-cares-fo1-api.dswd.gov.ph
+      apiUrl.hostname = apiUrl.hostname.replace(
+        /(-fo1)(\.dswd\.gov\.ph)$/,
+        '$1-api$2'
+      )
+    } else {
+      // Dev:
+      // dev-hr-cares-fo1.dswd.gov.ph
+      // → dev-hr-cares-api-fo1.dswd.gov.ph
+      apiUrl.hostname = apiUrl.hostname.replace(
+        /(-fo1\.dswd\.gov\.ph)$/,
+        '-api$1'
+      )
+    }
 
   // Remove the first char of the uri if it starts with a '/'
   if (uri.charAt(0) === '/') uri = uri.substring(1)
