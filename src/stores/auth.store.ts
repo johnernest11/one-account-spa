@@ -214,6 +214,73 @@ export const useAuthStore = defineStore('auth', () => {
     return responseData
   }
 
+  const sendToApplication = async (payload: {
+    token: string
+    with_user: boolean
+    client_name: string
+    user: {
+      email: string | null | undefined
+      userId: number | string
+    }
+  }) => {
+    // Get the frontend redirect URL from ?redirect=
+    const currentUrl = new URL(window.location.href)
+
+    const redirectUrl = currentUrl.searchParams.get('redirect')
+
+    if (!redirectUrl) {
+      console.error('[SSO] Redirect URL is missing')
+      throw new Error('SSO redirect URL is missing')
+    }
+
+    /**
+     * Convert SPA URL to API URL.
+     *
+     * Local:
+     *   localhost:3001 → localhost:8001
+     *
+     * Dev/Staging:
+     *   -fo1.dswd.gov.ph → -api-fo1.dswd.gov.ph
+     */
+    const apiUrl = new URL(redirectUrl)
+
+    if (apiUrl.hostname === 'localhost') {
+      apiUrl.port = '8001'
+    } else {
+      apiUrl.hostname = apiUrl.hostname.replace(
+        /(-fo1\.dswd\.gov\.ph)$/,
+        '-api$1'
+      )
+    }
+
+    // API endpoint path from environment
+    const tokenPath = import.meta.env.VITE_API_SSO_URL
+
+    const tokenUrl = `${apiUrl.origin}/${tokenPath.replace(/^\/+/, '')}`
+
+    console.log('[SSO] Token URL:', tokenUrl)
+
+    const response = await fetch(tokenUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+      const errorBody = await response.text()
+
+      console.error('[SSO] Request failed:', errorBody)
+
+      throw new Error(
+        `SSO request failed with status ${response.status}`
+      )
+    }
+
+    return redirectUrl
+  }
+
   const signInToApplication = async (payload: LoginPayload, appName: string) => {
     payload.with_user = true
     payload.client_name = appName || 'Single Sign-On'
@@ -251,40 +318,26 @@ export const useAuthStore = defineStore('auth', () => {
         userId: authResponse.user.id,
       },
     }
-    await sendToApplication(hrPayload)
-    const hrCaresUrl = import.meta.env.VITE_SPA_SSO_URL
-    const url = `${hrCaresUrl}?token=${authResponse.token}`
-    window.location.replace(url)
+  const hrRedirectUrl = await sendToApplication(hrPayload)
+
+
+  if (!hrRedirectUrl) {
+    throw new Error('Redirect URL is missing')
+  }
+
+    const url = new URL(hrRedirectUrl)
+
+    url.searchParams.set('token', authResponse.token)
+
+    window.location.replace(url.toString())
 
     sessionStorage.removeItem('auth-token')
     sessionStorage.removeItem('auth-user')
     sessionStorage.removeItem('mfa-token')
     sessionStorage.removeItem('mfa-steps')
 
-    return { success: true }
-  }
-
-  const sendToApplication = async (payload: {
-    token: string
-    with_user: boolean
-    client_name: string
-    user: {
-      email: string | null | undefined
-      userId: number | string
+  return { success: true }
     }
-  }) => {
-    const hrCaresUrl = import.meta.env.VITE_API_SSO_URL
-    const response = await fetch(hrCaresUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-
-    const hrResponse = await response.json()
-    return hrResponse?.redirectUrl || null
-  }
 
   const register = async (payload: RegistrationPayload) => {
     const unWrappedPayload = {
