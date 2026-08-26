@@ -14,7 +14,16 @@ export const applications: { [key: string]: SSOApplication } = {
 }
 
 export const serviceName = {
-  get(app: string) {
-    return applications[app]
+  get(app: string, redirectUrl: string) {
+    const application = applications[app]
+
+    if (!application) {
+      return undefined
+    }
+
+    return {
+      ...application,
+      url: `${redirectUrl.replace(/\/$/, '')}/${application.url.replace(/^\//, '')}`,
+    }
   },
 }
