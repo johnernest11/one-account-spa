@@ -54,11 +54,37 @@ export const useApiCall = (uri: string, authToken: string | null = null) => {
 }
 
 export const useSSOApiCall = (uri: string, authToken: string | null = null) => {
-  const baseUrl = import.meta.env.VITE_API_ROOT_SSO_URL
+  // Get the frontend redirect URL from ?redirect=
+  const currentUrl = new URL(window.location.href)
+  const redirectUrl = currentUrl.searchParams.get('redirect')
+
+  if (!redirectUrl) {
+    throw new Error('SSO redirect URL is missing')
+  }
+
+  /**
+   * Convert SPA URL to API URL.
+   *
+   * Local:
+   *   localhost:3001 → localhost:8001
+   *
+   * Dev/Staging:
+   *   -fo1.dswd.gov.ph → -api-fo1.dswd.gov.ph
+   */
+  const apiUrl = new URL(redirectUrl)
+
+  if (apiUrl.hostname === 'localhost') {
+    apiUrl.port = '8001'
+  } else {
+    apiUrl.hostname = apiUrl.hostname.replace(
+      /(-fo1\.dswd\.gov\.ph)$/,
+      '-api$1',
+    )
+  }
 
   // Remove the first char of the uri if it starts with a '/'
   if (uri.charAt(0) === '/') uri = uri.substring(1)
-
+  const baseUrl = apiUrl.origin
   return useFetch(`${baseUrl}/${uri}`, {
     async beforeFetch({ url, options }) {
       if (!authToken) return { url, options }
